@@ -2,18 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 using Backend.Entities;
 
 namespace Backend.ServiceContracts.DTO
 {
     public class SceneryAddRequest
     {
-        public required string SceneryName { get; set; }
-        public required string Country { get; set; }
+        [Required]
+        public string SceneryName { get; set; } = string.Empty;
+        [Required]
+        public string Country { get; set; } = string.Empty;
         public string? City { get; set; }
         public byte[]? ImageData { get; set; }
         public string? Comment { get; set; }
-        // public required User SceneryUploader { get; set; }
+        [Required]
+        public int UserId { get; set; }
 
         public Scenery ToScenery()
         {
@@ -24,7 +28,7 @@ namespace Backend.ServiceContracts.DTO
                 City = this.City,
                 ImageData = this.ImageData,
                 Comment = this.Comment,
-                // SceneryUploader = this.SceneryUploader
+                UserId = this.UserId,
             };
         }
     }

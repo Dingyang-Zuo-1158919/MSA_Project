@@ -10,6 +10,7 @@ namespace Backend.RepositoryContracts
         Task<Scenery> UpdateScenery(Scenery scenery);
         Task<bool> DeleteScenery (Guid? sceneryId);
         Task<Scenery?> GetSceneryBySceneryId(Guid sceneryId);
+        Task<List<Scenery?>> GetSceneriesByUserId(int userId);
         Task<List<Scenery>> GetAllSceneries();
     }
 }

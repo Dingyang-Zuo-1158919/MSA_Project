@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Entities
 {
@@ -6,12 +7,22 @@ namespace Backend.Entities
     {
         [Key]
         public Guid SceneryId { get; set; }
+        [Required]
+        public string SceneryName { get; set; }
+        [Required]
+        public string Country { get; set; }
+        public string? City { get; set; } 
+        public byte[]? ImageData { get; set; } 
+        public string? Comment { get; set; } 
+        public int UserId { get; set; }
 
-        public required string SceneryName { get; set; }
-        public required string Country { get; set; }
-        public string? City { get; set; }
-        public byte[]? ImageData { get; set; }
-        public string? Comment { get; set; }
-        // public required User SceneryUploader { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public User? User { get; set; }
+
+        public Scenery()
+        {
+            SceneryName = string.Empty; 
+            Country = string.Empty;
+        }
     }
 }

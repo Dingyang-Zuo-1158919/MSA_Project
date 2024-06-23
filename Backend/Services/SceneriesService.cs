@@ -34,14 +34,13 @@ namespace Backend.Services
             ArgumentNullException.ThrowIfNull(sceneryUpdateRequest);
             ValidationHelper.ModelValidation(sceneryUpdateRequest);
 
-            Scenery? matchingScenery = await _sceneriesRepository.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
+            Scenery matchingScenery = await _sceneriesRepository.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
             ArgumentNullException.ThrowIfNull(matchingScenery);
             
             matchingScenery.SceneryId = sceneryUpdateRequest.SceneryId;
             matchingScenery.SceneryName = sceneryUpdateRequest.SceneryName;
             matchingScenery.Country = sceneryUpdateRequest.Country;
             matchingScenery.City = sceneryUpdateRequest.City;
-            matchingScenery.ImageData = sceneryUpdateRequest.ImageData;
             matchingScenery.Comment = sceneryUpdateRequest.Comment;
 
             await _sceneriesRepository.UpdateScenery(matchingScenery);
@@ -69,6 +68,17 @@ namespace Backend.Services
                 return null;
 
             return scenery.ToSceneryResponse();
+        }
+
+        public async Task<List<SceneryResponse?>> GetSceneriesByUserId(int userId)
+        {
+            ArgumentNullException.ThrowIfNull(userId);
+            List<Scenery?> sceneries = await _sceneriesRepository.GetSceneriesByUserId(userId);
+            if (sceneries == null)
+                return null;
+
+            List<SceneryResponse> sceneryResponses = sceneries.Select(scenery => scenery.ToSceneryResponse()).ToList();
+            return sceneryResponses;
         }
         
         public async Task<List<SceneryResponse>> GetAllSceneries()

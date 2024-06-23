@@ -1,6 +1,9 @@
 import { AppBar, Box, List, ListItem, Switch, Toolbar, Typography } from "@mui/material";
-import { NavLink } from "react-router-dom";
-
+import { NavLink, useNavigate } from "react-router-dom";
+import { logout } from '../Redux/Slices/authSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../Redux/store";
+import DropdownMenu from "./DropdownMenu";
 
 const navStyle = { color: 'inherit', textDecoration: 'none', typography: 'h6', '&:hover': { color: 'grey.500' }, '&.active': { color: 'text.secondary' } }
 
@@ -10,9 +13,18 @@ interface Props {
 }
 
 export default function Header({ darkMode, handleThemeChange }: Props) {
+    const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
+    const userName = useSelector((state: RootState) => state.auth.userName);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/homepage')
+    };
 
     return (
-        <AppBar>
+        <AppBar sx={{ position: 'static' }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box display='flex' alignItems='center'>
                     <Typography variant='h4' component={NavLink} to="/homepage" sx={navStyle}>Sceneries Sharing</Typography>
@@ -21,15 +33,22 @@ export default function Header({ darkMode, handleThemeChange }: Props) {
 
                 <List sx={{ display: 'flex' }}>
                     <ListItem component={NavLink} to="/sceneries" key='sceneries' sx={navStyle}>Sceneries</ListItem>
-                    <ListItem component={NavLink} to="/about" key='about' sx={navStyle}>About</ListItem>
-                    <ListItem component={NavLink} to="/contact" key='contact' sx={navStyle}>Contact</ListItem>
+                    <ListItem component={NavLink} to="/upload" key='upload' sx={navStyle}>Upload</ListItem>
                 </List>
 
                 <Box display='flex' alignItems='center'>
-                    <List sx={{ display: 'flex' }}>
-                        <ListItem component={NavLink} to="/login" key='login' sx={navStyle}>Log in</ListItem>
-                        <ListItem component={NavLink} to="/register" key='register' sx={navStyle}>Register</ListItem>
-                    </List>
+                    {isLoggedIn ? (
+                        <List sx={{ display: 'flex' }}>
+                            <ListItem >Welcome&nbsp;back, {userName}</ListItem>
+                            <DropdownMenu />
+                            <ListItem sx={navStyle} onClick={handleLogout} >Logout</ListItem>
+                        </List>
+                    ) : (
+                        <List sx={{ display: 'flex' }}>
+                            <ListItem component={NavLink} to="/login" key='login' sx={navStyle}>Log in</ListItem>
+                            <ListItem component={NavLink} to="/register" key='register' sx={navStyle}>Register</ListItem>
+                        </List>
+                    )}
                 </Box>
             </Toolbar>
         </AppBar>

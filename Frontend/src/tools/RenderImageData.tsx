@@ -1,18 +1,24 @@
-export function renderImageDataToString(imageData: Uint8Array): string {
-    if (!imageData || imageData.length === 0) {
+export function renderImageDataToString(imageData: Blob | null): string {
+    if (!imageData || imageData.size === 0) {
         return "No Image Data";
     }
-    return `Uint8Array of ${imageData.length} elements`;
+    return `Uint8Array of ${imageData.size} bytes`;
 }
 
-export function renderImageDataToImage(imageData: Uint8Array): JSX.Element
+export function renderImageDataToImageUrl(imageData: Blob | null): string
 {
-    if (!imageData || imageData.length === 0) {
-        return <img src="" alt="no image available" style={{ maxWidth: "100%", maxHeight: "300px" }} />;
+    if (!imageData || imageData.size === 0) {
+        return "";
     }
-    // Convert Uint8Array to base64 string
-    const base64String = btoa(String.fromCharCode(...imageData));
-    const imageUrl = `data:image/jpeg;base64,${base64String}`;
 
-    return <img src={imageUrl} alt="Scenery" style={{ maxWidth: "100%", maxHeight: "300px" }} />;
+    const reader = new FileReader();
+    reader.readAsDataURL(imageData);
+    let imageUrl = "";
+    reader.onload = () => {
+        if (typeof reader.result === 'string'){
+            imageUrl = reader.result;
+        }
+    };
+
+    return imageUrl;
 };

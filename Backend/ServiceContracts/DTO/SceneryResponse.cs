@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 using Backend.Entities;
 
 namespace Backend.ServiceContracts.DTO
@@ -9,16 +10,19 @@ namespace Backend.ServiceContracts.DTO
     public class SceneryResponse
     {
         public Guid SceneryId { get; set; }
-        public required string SceneryName { get; set; }
-        public required string Country { get; set; }
+        [Required]
+        public string SceneryName { get; set; }
+        [Required]
+        public string Country { get; set; }
         public string? City { get; set; }
         public byte[]? ImageData { get; set; }
         public string? Comment { get; set; }
-        // public required User SceneryUploader { get; set; }
+        [Required]
+        public int UserId { get; set; }
 
         public SceneryUpdateRequest ToSceneryUpdateRequest()
         {
-            return new SceneryUpdateRequest()
+            return new SceneryUpdateRequest
             {
                 SceneryId = SceneryId,
                 SceneryName = SceneryName,
@@ -26,7 +30,7 @@ namespace Backend.ServiceContracts.DTO
                 City = City,
                 ImageData = ImageData,
                 Comment = Comment,
-                // SceneryUploader = SceneryUploader
+                UserId = UserId,
             };
         }
     }
@@ -43,7 +47,7 @@ namespace Backend.ServiceContracts.DTO
                 City = scenery.City,
                 ImageData = scenery.ImageData,
                 Comment = scenery.Comment,
-                // SceneryUploader = scenery.SceneryUploader
+                UserId = scenery.UserId,
             };
         }
     }

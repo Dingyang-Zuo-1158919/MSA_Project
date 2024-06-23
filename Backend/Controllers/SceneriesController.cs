@@ -2,15 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.IO;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Backend.ServiceContracts;
 using Backend.ServiceContracts.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Backend.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+
 
 namespace Backend.Controllers
 {
-    
+
     public class SceneriesController : BaseApiController
     {
         private readonly ILogger<SceneriesController> _logger;
@@ -22,7 +30,7 @@ namespace Backend.Controllers
             _sceneriesService = sceneriesService;
         }
 
-        
+
         [Route("/")]
         [Route("[action]")]
         [HttpGet]
@@ -33,69 +41,159 @@ namespace Backend.Controllers
         }
 
         [Route("[action]")]
-        [HttpPost]
-        public async Task<IActionResult> AddScenery(SceneryAddRequest sceneryAddRequest)
-        {
-            if (!ModelState.IsValid)
-            {
-                List<SceneryResponse> sceneries = await _sceneriesService.GetAllSceneries();
-                return BadRequest(new ProblemDetails{Title = "invalid scenery content"});
-            }
-
-            SceneryResponse sceneryResponse = await _sceneriesService.AddScenery(sceneryAddRequest);
-
-            return RedirectToAction("Index", "Sceneries");
-        }
-
-        [Route("[action]")]
         [HttpGet]
-        public async Task<ActionResult<SceneryUpdateRequest>> Update(Guid sceneryId)
+        public async Task<ActionResult<SceneryResponse>> GetScenery(string? Id)
         {
-            SceneryResponse? sceneryResponse = await _sceneriesService.GetSceneryBySceneryId(sceneryId);
-            if (sceneryResponse == null)
+
+            if (Id == null)
             {
-                return RedirectToAction("Index", "Sceneries");
+                return BadRequest("sceneryId must be provided.");
             }
 
-            SceneryUpdateRequest sceneryUpdateRequest = sceneryResponse.ToSceneryUpdateRequest();
+            if (!Guid.TryParse(Id, out Guid sceneryId))
+            {
+                return BadRequest("Invalid sceneryId format.");
+            }
 
-            return sceneryUpdateRequest;
+            SceneryResponse? scenery = await _sceneriesService.GetSceneryBySceneryId(sceneryId);
+
+            if (scenery == null)
+            {
+                return NotFound();
+            }
+
+            return scenery;
         }
 
+        [Authorize]
+        [Route("[action]")]
+        [HttpPost]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AddScenery([FromForm] SceneryAddRequest sceneryAddRequest)
+        {
+            Console.WriteLine(sceneryAddRequest);
+            if (sceneryAddRequest == null)
+            {
+                return BadRequest(new ProblemDetails { Title = "Invalid scenery or image data" });
+            }
+
+            // if (sceneryAddRequest == null || sceneryAddRequest.ImageData == null || sceneryAddRequest.ImageData.Length == 0)
+            // {
+            //     return BadRequest(new ProblemDetails { Title = "Invalid scenery or image data" });
+            // }
+
+            Console.WriteLine($"Received scenery add request: SceneryName={sceneryAddRequest.SceneryName}, ImageData={sceneryAddRequest.ImageData}");
+
+            var sceneryResponse = await _sceneriesService.AddScenery(sceneryAddRequest);
+            return Ok(sceneryResponse);
+        }
+
+
+        [Authorize]
         [Route("[action]")]
         [HttpPut]
-        public async Task<ActionResult<SceneryUpdateRequest>> Update(SceneryUpdateRequest sceneryUpdateRequest)
+        public async Task<IActionResult> Update(SceneryUpdateRequest sceneryUpdateRequest)
         {
-            SceneryResponse? sceneryResponse = await _sceneriesService.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
-            if (sceneryUpdateRequest == null)
+            var scenery = await _sceneriesService.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
+            if (scenery == null)
             {
-                return RedirectToAction("Index", "Sceneries");
+                return BadRequest("Scenery not found.");
             }
 
-            if (ModelState.IsValid)
+            var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            if (scenery.UserId != loggedInUserId)
             {
-                SceneryResponse updateScenery = await _sceneriesService.UpdateScenery(sceneryUpdateRequest);
-                return RedirectToAction("Index", "Sceneries");
+                return Forbid(); // Return 403 Forbidden if not authorized
             }
-            else
+
+            if (!string.IsNullOrEmpty(sceneryUpdateRequest.SceneryName))
             {
-                return BadRequest(new ProblemDetails { Title = "This is a bad request" });
+                scenery.SceneryName = sceneryUpdateRequest.SceneryName;
+            }
+
+            if (!string.IsNullOrEmpty(sceneryUpdateRequest.Country))
+            {
+                scenery.Country = sceneryUpdateRequest.Country;
+            }
+
+            if (!string.IsNullOrEmpty(sceneryUpdateRequest.City))
+            {
+                scenery.City = sceneryUpdateRequest.City;
+            }
+
+            if (!string.IsNullOrEmpty(sceneryUpdateRequest.Comment))
+            {
+                scenery.Comment = sceneryUpdateRequest.Comment;
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedScenery = await _sceneriesService.UpdateScenery(sceneryUpdateRequest);
+                return Ok(updatedScenery);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
 
         }
 
+        [Authorize]
         [Route("[action]")]
         [HttpDelete]
-        public async Task<IActionResult> Delete(SceneryUpdateRequest scenery)
+        public async Task<IActionResult> Delete(string? Id)
         {
-            SceneryResponse? sceneryResponse = await _sceneriesService.GetSceneryBySceneryId(scenery.SceneryId);
-            if (sceneryResponse == null)
+            if (Id == null)
             {
-                return RedirectToAction("Index", "Sceneries");
+                return BadRequest("the scenery does not exist.");
             }
 
-            await _sceneriesService.DeleteScenery(sceneryResponse.SceneryId);
-            return RedirectToAction("Index", "Sceneries");
+            if (!Guid.TryParse(Id, out Guid sceneryId))
+            {
+                return BadRequest("Invalid sceneryId format.");
+            }
+
+            bool result = await _sceneriesService.DeleteScenery(sceneryId);
+
+            if (!result)
+            {
+                return BadRequest("Failed to delete scenery.");
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
+        [Route("[action]")]
+        [HttpGet]
+        public async Task<IActionResult> GetSceneriesByUserId(int userId)
+        {
+            try
+            {
+                if (userId <= 0)
+                {
+                    return BadRequest("the scenery does not exist.");
+                }
+
+                var sceneries = await _sceneriesService.GetSceneriesByUserId(userId);
+
+                if (sceneries == null)
+                {
+                    return BadRequest("Failed to fetch your uploads.");
+                }
+
+                return Ok(sceneries);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
         }
     }
 }

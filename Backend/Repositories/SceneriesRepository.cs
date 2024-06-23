@@ -55,6 +55,13 @@ namespace Backend.Repositories
             return await _db.Sceneries.FirstOrDefaultAsync(temp => temp.SceneryId == sceneryId);
         }
 
+        public async Task<List<Scenery?>> GetSceneriesByUserId(int userId)
+        {
+            return await _db.Sceneries
+                .Where(s => s.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<List<Scenery>> GetAllSceneries()
         {
             return await _db.Sceneries.ToListAsync();

@@ -2,12 +2,16 @@ import { Container, createTheme, CssBaseline, ThemeProvider } from '@mui/materia
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SceneriesPage from './pages/SceneriesPage';
 import { useState } from 'react';
 import Header from './components/Header';
+import UploadPage from './pages/UploadPage';
+import MyCollectionPage from './pages/MyCollectionPage';
+import UpdatePage from './pages/UpdatePage';
+import MyUploadPage from './pages/MyUploadPage';
+import ErrorPage from './pages/ErrorPage';
 
 export default function App() {
 
@@ -36,10 +40,14 @@ export default function App() {
             <Routes>
               <Route path="/homepage" element={<HomePage />} />
               <Route path="/sceneries" element={<SceneriesPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/about/:Id" element={<AboutPage />} />
+              <Route path="mycollection/:Id" element={<MyCollectionPage />} />
+              <Route path="myupload/:Id" element={<MyUploadPage />} />
+              <Route path="update/:Id" element={<UpdatePage />} />
+              <Route path="/upload" element={<UploadPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="*" element={<ErrorPage />} />
             </Routes>
           </Container>}
       </BrowserRouter>

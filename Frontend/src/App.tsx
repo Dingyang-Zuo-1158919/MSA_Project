@@ -5,16 +5,17 @@ import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SceneriesPage from './pages/SceneriesPage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import UploadPage from './pages/UploadPage';
 import MyCollectionPage from './pages/MyCollectionPage';
 import UpdatePage from './pages/UpdatePage';
 import MyUploadPage from './pages/MyUploadPage';
 import ErrorPage from './pages/ErrorPage';
+import LoadingComponent from './components/LoadingComponent';
 
 export default function App() {
-
+  const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const paletteType = darkMode ? 'dark' : 'light';
   const theme = createTheme({
@@ -26,6 +27,10 @@ export default function App() {
     }
   })
 
+  useEffect(() => {
+    setLoading(false);
+  }, [])
+
   function handleThemeChange() {
     setDarkMode(!darkMode);
   }
@@ -35,21 +40,23 @@ export default function App() {
       <CssBaseline />
       <BrowserRouter>
         <Header darkMode={darkMode} handleThemeChange={handleThemeChange} />
-        {location.pathname === '/' ? <HomePage /> :
-          <Container sx={{ mt: 4 }}>
-            <Routes>
-              <Route path="/homepage" element={<HomePage />} />
-              <Route path="/sceneries" element={<SceneriesPage />} />
-              <Route path="/about/:Id" element={<AboutPage />} />
-              <Route path="mycollection/:Id" element={<MyCollectionPage />} />
-              <Route path="myupload/:Id" element={<MyUploadPage />} />
-              <Route path="update/:Id" element={<UpdatePage />} />
-              <Route path="/upload" element={<UploadPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="*" element={<ErrorPage />} />
-            </Routes>
-          </Container>}
+        {loading ? (<LoadingComponent message="Initializing app..." />)
+          : (
+            <Container sx={{ mt: 4 }}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/sceneries" element={<SceneriesPage />} />
+                <Route path="/about/:Id" element={<AboutPage />} />
+                <Route path="mycollection/:Id" element={<MyCollectionPage />} />
+                <Route path="myupload/:Id" element={<MyUploadPage />} />
+                <Route path="update/:Id" element={<UpdatePage />} />
+                <Route path="/upload" element={<UploadPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="*" element={<ErrorPage />} />
+              </Routes>
+            </Container>
+          )}
       </BrowserRouter>
     </ThemeProvider>
   )

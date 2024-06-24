@@ -1,9 +1,8 @@
-import { Avatar, Box, Button, Container, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Container, Grid, Paper, SnackbarContent, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 
 export default function RegisterPage() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -19,13 +18,8 @@ export default function RegisterPage() {
   const [formValid, setFormValid] = useState(false);
   const [registrationError, setRegistrationError] = useState<string[]>([]);
   const navigate = useNavigate();
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isUsernameTouched, setIsUsernameTouched] = useState(false);
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,11 +27,10 @@ export default function RegisterPage() {
     try {
       const { userName, email, password } = formData;
       await axios.post(`${API_URL}/Users/Register`, { userName, email, password });
-      setSnackbarMessage("Upload successful!");
-      setOpenSnackbar(true);
+      setShowSuccessMessage(true);
       setTimeout(() => {
         navigate('/login');
-      }, 1000);
+      }, 1500);
     } catch (error: any) {
       let errors: string[] = [];
       if (error.response && error.response.status === 404) {
@@ -141,15 +134,17 @@ export default function RegisterPage() {
           </Grid>
         </Grid>
       </Box>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-            <MuiAlert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
-              {snackbarMessage}
-            </MuiAlert>
-          </Snackbar>
-        </Grid>
-      </Grid>
+      <Snackbar
+                open={showSuccessMessage}
+                autoHideDuration={3000}
+                onClose={() => setShowSuccessMessage(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <SnackbarContent
+                    sx={{ backgroundColor: 'success.main' }}
+                    message="Register successful!"
+                />
+            </Snackbar>
     </Container>
   )
 }

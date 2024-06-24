@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Container, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, Container, Grid, Paper, Snackbar, SnackbarContent, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useDispatch } from 'react-redux';
 import { login } from '../Redux/Slices/authSlice';
@@ -15,6 +15,7 @@ export default function LoginPage() {
         rememberMe: false
     });
     const [loginError, setLoginError] = useState('');
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,7 +30,11 @@ export default function LoginPage() {
                 userName: response.data.userName,
                 token: response.data.token.result
             }));
-            navigate('/homepage');
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+                navigate('/');
+            }, 1000);
+
         } catch (error: any) {
             if (error.response && error.response.status === 404) {
                 setLoginError("Login failed: User not found");
@@ -55,8 +60,8 @@ export default function LoginPage() {
                 Log in
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                <TextField margin="normal" fullWidth label="Username" autoFocus name="userName" onChange={handleChange} autoComplete="current-username"/>
-                <TextField margin="normal" fullWidth label="Password" type="password" name="password" onChange={handleChange} autoComplete="current-password"/>
+                <TextField margin="normal" fullWidth label="Username" autoFocus name="userName" onChange={handleChange} autoComplete="current-username" />
+                <TextField margin="normal" fullWidth label="Password" type="password" name="password" onChange={handleChange} autoComplete="current-password" />
                 {loginError && (
                     <Typography variant="body2" color="error" paragraph>
                         {loginError}
@@ -73,6 +78,17 @@ export default function LoginPage() {
                     </Grid>
                 </Grid>
             </Box>
+            <Snackbar
+                open={showSuccessMessage}
+                autoHideDuration={3000}
+                onClose={() => setShowSuccessMessage(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <SnackbarContent
+                    sx={{ backgroundColor: 'success.main' }}
+                    message="Login successful!"
+                />
+            </Snackbar>
         </Container>
     )
 }

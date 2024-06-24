@@ -11,9 +11,9 @@ namespace Backend.ServiceContracts.DTO
     {
         public Guid SceneryId { get; set; }
         [Required]
-        public string SceneryName { get; set; }
+        public string SceneryName { get; set; } = string.Empty;
         [Required]
-        public string Country { get; set; }
+        public string Country { get; set; } = string.Empty;
         public string? City { get; set; }
         public byte[]? ImageData { get; set; }
         public string? Comment { get; set; }
@@ -28,7 +28,7 @@ namespace Backend.ServiceContracts.DTO
                 SceneryName = SceneryName,
                 Country = Country,
                 City = City,
-                ImageData = ImageData,
+                // ImageData = ImageData,
                 Comment = Comment,
                 UserId = UserId,
             };

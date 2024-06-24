@@ -71,23 +71,19 @@ namespace Backend.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddScenery([FromForm] SceneryAddRequest sceneryAddRequest)
         {
-            Console.WriteLine(sceneryAddRequest);
+            if (sceneryAddRequest == null || sceneryAddRequest.ImageData == null || sceneryAddRequest.ImageData.Length == 0)
+            {
+                return BadRequest(new ProblemDetails { Title = "Invalid scenery or image data" });
+            }
+
             if (sceneryAddRequest == null)
             {
                 return BadRequest(new ProblemDetails { Title = "Invalid scenery or image data" });
             }
 
-            // if (sceneryAddRequest == null || sceneryAddRequest.ImageData == null || sceneryAddRequest.ImageData.Length == 0)
-            // {
-            //     return BadRequest(new ProblemDetails { Title = "Invalid scenery or image data" });
-            // }
-
-            Console.WriteLine($"Received scenery add request: SceneryName={sceneryAddRequest.SceneryName}, ImageData={sceneryAddRequest.ImageData}");
-
             var sceneryResponse = await _sceneriesService.AddScenery(sceneryAddRequest);
             return Ok(sceneryResponse);
         }
-
 
         [Authorize]
         [Route("[action]")]

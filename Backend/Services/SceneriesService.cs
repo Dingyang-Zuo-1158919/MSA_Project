@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Backend.Entities;
 using Backend.Repositories;
 using Backend.RepositoryContracts;
@@ -9,24 +10,42 @@ using Backend.ServiceContracts;
 using Backend.ServiceContracts.DTO;
 using Backend.Services.Helpers;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using Azure.Storage.Blobs;
 
 namespace Backend.Services
 {
-    public class SceneriesService(ISceneriesRepository sceneriesRepository) : ISceneriesService
+    public class SceneriesService(ISceneriesRepository sceneriesRepository, IConfiguration configuration) : ISceneriesService
     {
         private readonly ISceneriesRepository _sceneriesRepository = sceneriesRepository;
+        private readonly IConfiguration _configuration = configuration;
 
-        public async Task<SceneryResponse> AddScenery(SceneryAddRequest? sceneryAddRequest)
+        public async Task<SceneryResponse> AddScenery(SceneryAddRequest sceneryAddRequest)
         {
             ArgumentNullException.ThrowIfNull(sceneryAddRequest);
             ValidationHelper.ModelValidation(sceneryAddRequest);
 
-            Scenery scenery = sceneryAddRequest.ToScenery();
-            scenery.SceneryId = Guid.NewGuid();
+            byte[] imageData;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await sceneryAddRequest.ImageData.CopyToAsync(memoryStream);
+                imageData = memoryStream.ToArray();
+            }
+
+            var scenery = new Scenery
+            {
+                SceneryId = Guid.NewGuid(),
+                SceneryName = sceneryAddRequest.SceneryName,
+                Country = sceneryAddRequest.Country,
+                City = sceneryAddRequest.City,
+                ImageData = imageData,
+                Comment = sceneryAddRequest.Comment,
+                UserId = sceneryAddRequest.UserId
+            };
 
             await _sceneriesRepository.AddScenery(scenery);
-
-            return scenery.ToSceneryResponse();
+            var result = scenery.ToSceneryResponse();
+            return result;
         }
 
         public async Task<SceneryResponse> UpdateScenery(SceneryUpdateRequest? sceneryUpdateRequest)
@@ -34,14 +53,23 @@ namespace Backend.Services
             ArgumentNullException.ThrowIfNull(sceneryUpdateRequest);
             ValidationHelper.ModelValidation(sceneryUpdateRequest);
 
+            byte[] imageData;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await sceneryUpdateRequest.ImageData.CopyToAsync(memoryStream);
+                imageData = memoryStream.ToArray();
+            }
+
             Scenery matchingScenery = await _sceneriesRepository.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
             ArgumentNullException.ThrowIfNull(matchingScenery);
-            
+
             matchingScenery.SceneryId = sceneryUpdateRequest.SceneryId;
             matchingScenery.SceneryName = sceneryUpdateRequest.SceneryName;
             matchingScenery.Country = sceneryUpdateRequest.Country;
             matchingScenery.City = sceneryUpdateRequest.City;
             matchingScenery.Comment = sceneryUpdateRequest.Comment;
+            matchingScenery.ImageData = imageData;
 
             await _sceneriesRepository.UpdateScenery(matchingScenery);
 
@@ -80,12 +108,11 @@ namespace Backend.Services
             List<SceneryResponse> sceneryResponses = sceneries.Select(scenery => scenery.ToSceneryResponse()).ToList();
             return sceneryResponses;
         }
-        
+
         public async Task<List<SceneryResponse>> GetAllSceneries()
         {
             var sceneries = await _sceneriesRepository.GetAllSceneries();
             return sceneries.Select(temp => temp.ToSceneryResponse()).ToList();
         }
-
     }
 }

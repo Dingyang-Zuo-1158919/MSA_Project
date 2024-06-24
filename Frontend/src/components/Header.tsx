@@ -17,17 +17,17 @@ export default function Header({ darkMode, handleThemeChange }: Props) {
     const userName = useSelector((state: RootState) => state.auth.userName);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     const handleLogout = () => {
         dispatch(logout());
-        navigate('/homepage')
+        navigate('/')
     };
 
     return (
         <AppBar sx={{ position: 'static' }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box display='flex' alignItems='center'>
-                    <Typography variant='h4' component={NavLink} to="/homepage" sx={navStyle}>Sceneries Sharing</Typography>
+                    <Typography variant='h4' component={NavLink} to="/" sx={navStyle}>Sceneries Sharing</Typography>
                     <Switch checked={darkMode} onChange={handleThemeChange} />
                 </Box>
 

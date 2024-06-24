@@ -3,7 +3,7 @@ import { RootState } from "../Redux/store";
 import { useEffect, useState } from "react";
 import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
-import { Box, Button, Grid, Pagination, Switch, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Pagination, Switch, Typography } from "@mui/material";
 import SingleScenery from "./SingleScenery";
 
 export default function MyCollectionPage() {
@@ -14,6 +14,7 @@ export default function MyCollectionPage() {
     const [itemsPerPage] = useState(6);
     const [sortBy, setSortBy] = useState<string>("sceneryName");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [sorting, setSorting] = useState(false);
     const [selectedSortOption, setSelectedSortOption] = useState<string>("sceneryName");
     const [forceUpdate, setForceUpdate] = useState(false);
 
@@ -25,8 +26,10 @@ export default function MyCollectionPage() {
                         'Authorization': `Bearer ${token}`,
                     }
                 };
+                setSorting(true);
                 const response = await agent.fetchUserCollection(userId, config);
                 sortCollection(response);
+                setSorting(false);
             } catch (error) {
                 console.error('Error fetching user collection:', error);
             }
@@ -38,18 +41,24 @@ export default function MyCollectionPage() {
     }, [userId, token, forceUpdate]);
 
     const sortCollection = (response: Scenery[], order: "asc" | "desc" = sortOrder) => {
-        const sortedCollection = [...response].sort((a, b) => {
-            if (sortBy === "sceneryName") {
-                return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
-            } else if (sortBy === "country") {
-                return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
-            } else if (sortBy === "city") {
-                return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
-            }
-            return 0;
-        });
-
-        setCollection(sortedCollection);
+        setSorting(true);
+        try {
+            const sortedCollection = [...response].sort((a, b) => {
+                if (sortBy === "sceneryName") {
+                    return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
+                } else if (sortBy === "country") {
+                    return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
+                } else if (sortBy === "city") {
+                    return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
+                }
+                return 0;
+            });
+            setCollection(sortedCollection);
+        } catch (error) {
+            console.error('Error sorting collections:', error);
+        } finally {
+            setSorting(false);
+        }
     };
 
     const handleSort = (criteria: string) => {
@@ -133,20 +142,23 @@ export default function MyCollectionPage() {
                     overflowY: 'auto',
                 }}
             >
+                {sorting && (
+                    <CircularProgress
+                        size={40}
+                        style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                    />
+                )}
+                {collection.length === 0 && !sorting && (
+                    <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>
+                        You haven't make any collection.
+                    </Typography>
+                )}
                 <Grid container spacing={2}>
-                    {collection.length === 0 ? (
-                        <Grid item xs={12}>
-                            <Typography variant="h4" align="center" sx={{ mt: 35 }}>
-                                No items in your collection.
-                            </Typography>
+                    {collection.length > 0 && currentItems.map(c => (
+                        <Grid item xs={4} key={c.sceneryId}>
+                            <SingleScenery scenery={c} />
                         </Grid>
-                    ) : (
-                        currentItems.map(c => (
-                            <Grid item xs={4} key={c.sceneryId}>
-                                <SingleScenery scenery={c} />
-                            </Grid>
-                        ))
-                    )}
+                    ))}
                 </Grid>
                 <Grid container justifyContent="center" sx={{ mt: 2 }}>
                     <Pagination

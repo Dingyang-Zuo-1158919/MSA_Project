@@ -4,6 +4,6 @@ export interface Scenery {
     country: string;
     city: string;
     comment: string;
-    imageData: Blob;
+    imageData: any;
     userId: number;
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Backend.ServiceContracts.DTO;
 
 namespace Backend.Entities
 {
@@ -11,9 +12,10 @@ namespace Backend.Entities
         public string SceneryName { get; set; }
         [Required]
         public string Country { get; set; }
-        public string? City { get; set; } 
-        public byte[]? ImageData { get; set; } 
-        public string? Comment { get; set; } 
+        public string? City { get; set; }
+        [Required]
+        public byte[]? ImageData { get; set; }
+        public string? Comment { get; set; }
         public int UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
@@ -21,7 +23,7 @@ namespace Backend.Entities
 
         public Scenery()
         {
-            SceneryName = string.Empty; 
+            SceneryName = string.Empty;
             Country = string.Empty;
         }
     }

@@ -6,12 +6,15 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import agent from "../api/agent";
+import compressImage from 'browser-image-compression';
 
 export default function UploadPage() {
     const theme = useTheme();
     const navigate = useNavigate();
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+    const [successSnackbarMessage, setSuccessSnackbarMessage] = useState('');
+    const [errorSnackbarMessage, setErrorSnackbarMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [image, setImage] = useState<string | undefined>(undefined);
     const [sceneryName, setSceneryName] = useState<string>('');
@@ -23,59 +26,62 @@ export default function UploadPage() {
     const token = useSelector((state: RootState) => state.auth.token);
     const [sceneryNameTouched, setSceneryNameTouched] = useState(false);
     const [countryTouched, setCountryTouched] = useState(false);
+    const MAX_FILE_SIZE_MB = 1;
 
 
-    const handleCloseSnackbar = () => {
-        setOpenSnackbar(false);
+    const handleCloseSuccessSnackbar = () => {
+        setOpenSuccessSnackbar(false);
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCloseErrorSnackbar = () => {
+        setOpenErrorSnackbar(false);
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
-            setSelectedFile(file);
-            const imageUrl = URL.createObjectURL(file);
-            setImage(imageUrl);
-        }
-    };
 
-    const fileToUint8Array = (file: File): Promise<Uint8Array> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.result instanceof ArrayBuffer) {
-                    const arrayBuffer = reader.result;
-                    const uint8Array = new Uint8Array(arrayBuffer);
-                    resolve(uint8Array);
-                } else {
-                    reject(new Error('Failed to read file as ArrayBuffer.'));
+            if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                try {
+                    const options = {
+                        maxSizeMB: MAX_FILE_SIZE_MB,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                    };
+                    const compressedFile = await compressImage(file, options);
+
+                    setSelectedFile(compressedFile);
+                    const imageUrl = URL.createObjectURL(compressedFile);
+                    setImage(imageUrl);
+                } catch (error) {
+                    console.error('Image compression error: ', error);
                 }
-            };
-            reader.onerror = (error) => {
-                reject(error);
-            };
-            reader.readAsArrayBuffer(file);
-        });
+            } else {
+                setSelectedFile(file);
+                    const imageUrl = URL.createObjectURL(file);
+                    setImage(imageUrl);
+            }
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        // if (!selectedFile) {
-        //     console.error('No file selected.');
-        //     return;
-        // }
+        if (!selectedFile) {
+            console.error('No file selected.');
+            return;
+        }
         try {
             const formData = new FormData();
-            formData.append('sceneryName', sceneryName);
-            formData.append('country', country);
+            formData.append('SceneryName', sceneryName);
+            formData.append('Country', country);
 
             if (city !== '') {
                 formData.append('City', city);
             };
 
             if (selectedFile) {
-                const byteArr = await fileToUint8Array(selectedFile);
-                formData.append('ImageData', new Blob([byteArr], { type: selectedFile.type }));
+                formData.append('ImageData', selectedFile);
             };
 
             if (comment !== '') {
@@ -89,23 +95,34 @@ export default function UploadPage() {
                     'Authorization': `Bearer ${token}`,
                 }
             };
-
             const response = await agent.addScenery(formData, config);
             if (response.sceneryId) {
-                setSnackbarMessage("Upload successful!");
-                setOpenSnackbar(true);
+                setSuccessSnackbarMessage("Upload successful!");
+                setOpenSuccessSnackbar(true);
                 setSelectedFile(null);
                 setImage(undefined);
                 setSceneryName('');
                 setCountry('');
                 setCity('');
                 setComment('');
+                setCountryTouched(false);
+                setSceneryNameTouched(false);
             } else {
                 console.error('upload failed.');
+                setErrorSnackbarMessage("Upload failed.");
+                setOpenErrorSnackbar(true);
             }
         } catch (error: any) {
             console.error('Error uploading file:', error);
-            console.log('Detailed error response:', error.response);
+            setErrorSnackbarMessage("Upload error.");
+            setOpenErrorSnackbar(true);
+            if (error.response) {
+                console.log('Detailed error response:', error.response);
+                setErrorSnackbarMessage("Upload error.");
+                setOpenErrorSnackbar(true);
+            } else {
+                console.log('Error details:', error.message);
+            }
         }
     }
 
@@ -185,8 +202,6 @@ export default function UploadPage() {
                         </Grid>
                     </Grid>
 
-                    <Divider sx={{ mb: 10 }} />
-
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <Button
@@ -209,7 +224,7 @@ export default function UploadPage() {
                         </Grid>
                         <Grid item xs={6}>
                             <Button
-                                onClick={() => navigate('/homepage')}
+                                onClick={() => navigate('/')}
                                 sx={{
                                     color: 'white',
                                     fontWeight: 'bold',
@@ -229,9 +244,16 @@ export default function UploadPage() {
 
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
-                            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                                <MuiAlert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
-                                    {snackbarMessage}
+                            <Snackbar open={openSuccessSnackbar} autoHideDuration={6000} onClose={handleCloseSuccessSnackbar}>
+                                <MuiAlert onClose={handleCloseSuccessSnackbar} severity="success" sx={{ width: '100%', backgroundColor: theme.palette.success.main, color: 'white', fontWeight: 'bold' }}>
+                                    {successSnackbarMessage}
+                                </MuiAlert>
+                            </Snackbar>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Snackbar open={openErrorSnackbar} autoHideDuration={6000} onClose={handleCloseErrorSnackbar}>
+                                <MuiAlert onClose={handleCloseErrorSnackbar} severity="error" sx={{ width: '100%', backgroundColor: theme.palette.error.main, color: 'white', fontWeight: 'bold' }}>
+                                    {errorSnackbarMessage}
                                 </MuiAlert>
                             </Snackbar>
                         </Grid>

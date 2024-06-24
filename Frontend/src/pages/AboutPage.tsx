@@ -1,5 +1,4 @@
-import { Button, Divider, Grid, Link, Typography, useTheme } from "@mui/material";
-import { renderImageDataToImageUrl } from "../tools/RenderImageData";
+import { Button, CircularProgress, Divider, Grid, Link, Typography, useTheme } from "@mui/material";
 import agent from "../api/agent";
 import { useEffect, useState } from "react";
 import { Scenery } from "../models/Scenery";
@@ -8,6 +7,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 export default function AboutPage() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -20,6 +20,8 @@ export default function AboutPage() {
     const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
     const [isCollected, setIsCollected] = useState(false);
     const token = useSelector((state: RootState) => state.auth.token);
+    const [openModal, setOpenModal] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchScenery = async () => {
@@ -28,6 +30,7 @@ export default function AboutPage() {
                     console.error('Scenery ID is empty or undefined.');
                     return;
                 }
+                setLoading(true);
                 const fetchedScenery = await agent.getSceneryById(Id);
                 setScenery(fetchedScenery);
 
@@ -44,10 +47,20 @@ export default function AboutPage() {
                 }
             } catch (error) {
                 console.error('Error fetching scenery:', error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchScenery();
-    }, [userId, Id])
+    }, [userId, Id, token])
+
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    };
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
@@ -131,6 +144,10 @@ export default function AboutPage() {
             }, 1000);
         } catch (error) {
             console.error('Error deleting scenery:', error);
+        } finally {
+            setOpenModal(false);
+            setSnackbarMessage("Deleted successful!");
+            setOpenSnackbar(true);
         }
     }
 
@@ -139,15 +156,40 @@ export default function AboutPage() {
     }
 
     if (!scenery) {
-        return <div>Loading...</div>
+        return (
+            <div style={{ position: 'relative' }}>
+                <Typography variant="h5" sx={{ textAlign: 'center' }}></Typography>
+                {loading && (<CircularProgress
+                    size={40}
+                    style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                />
+                )}
+            </div>
+        );
     };
 
-    const image = renderImageDataToImageUrl(scenery.imageData);
+    // convert Base64
+    const base64ImageData = scenery.imageData;
+    const byteCharacters = atob(base64ImageData);
+
+    // transfer to Uint8Array
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    // generate Blob object
+    const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 这里的type要根据实际情况设置
+
+    // generate URL
+    const imageUrl = URL.createObjectURL(blob);
+
 
     return (
         <Grid container spacing={6} sx={{ mt: 15 }}>
             <Grid item xs={6}>
-                <img src={image} alt={scenery.sceneryName} style={{ width: '100%' }} />
+                <img src={imageUrl} alt={scenery.sceneryName} style={{ width: '100%' }} />
             </Grid>
             <Grid item xs={6}>
                 <Typography variant='h3' sx={{ mb: 2 }} >{scenery.sceneryName}</Typography>
@@ -228,7 +270,7 @@ export default function AboutPage() {
                     </Grid>
 
                     <Grid item xs={6}>
-                        <Button onClick={handleDelete} disabled={!isLoggedIn || userId !== scenery.userId} sx={{
+                        <Button onClick={handleOpenModal} disabled={!isLoggedIn || userId !== scenery.userId} sx={{
                             color: theme.palette.error.contrastText, backgroundColor: "#f6685e", fontWeight: 'bold', fontSize: '15px',
                             border: "2px solid #f6685e",
                             '&:hover': {
@@ -237,6 +279,11 @@ export default function AboutPage() {
                                 border: `2px solid ${theme.palette.error.main}`,
                             }
                         }}>Delete</Button>
+                        <DeleteConfirmationModal
+                            open={openModal}
+                            onClose={handleCloseModal}
+                            onConfirmDelete={handleDelete}
+                        />
                     </Grid>
                     <Divider sx={{ mt: 5 }} />
                 </Grid>

@@ -14,10 +14,10 @@ namespace Backend.ServiceContracts.DTO
         [Required]
         public string Country { get; set; } = string.Empty;
         public string? City { get; set; }
-        public byte[]? ImageData { get; set; }
         public string? Comment { get; set; }
         [Required]
         public int UserId { get; set; }
+        public IFormFile ImageData { get; set; }
 
         public Scenery ToScenery()
         {
@@ -26,7 +26,7 @@ namespace Backend.ServiceContracts.DTO
                 SceneryName = this.SceneryName,
                 Country = this.Country,
                 City = this.City,
-                ImageData = this.ImageData,
+                // ImageData = this.ImageData,
                 Comment = this.Comment,
                 UserId = this.UserId,
             };

@@ -3,7 +3,7 @@ import { RootState } from "../Redux/store";
 import { useEffect, useState } from "react";
 import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
-import { Box, Button, Grid, Pagination, Switch, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Pagination, Switch, Typography } from "@mui/material";
 import SingleScenery from "./SingleScenery";
 
 export default function MyUploadPage() {
@@ -14,6 +14,7 @@ export default function MyUploadPage() {
     const [itemsPerPage] = useState(6);
     const [sortBy, setSortBy] = useState<string>("sceneryName");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [sorting, setSorting] = useState(false);
     const [selectedSortOption, setSelectedSortOption] = useState<string>("sceneryName");
     const [forceUpdate, setForceUpdate] = useState(false);
 
@@ -25,8 +26,10 @@ export default function MyUploadPage() {
                         'Authorization': `Bearer ${token}`,
                     }
                 };
+                setSorting(true);
                 const response = await agent.fetchUserUpload(userId, config);
                 sortUpload(response);
+                setSorting(false);
             } catch (error) {
                 console.error('Error fetching user collection:', error);
             }
@@ -38,18 +41,24 @@ export default function MyUploadPage() {
     }, [userId, token, forceUpdate]);
 
     const sortUpload = (response: Scenery[], order: "asc" | "desc" = sortOrder) => {
-        const sortedUpload = [...response].sort((a, b) => {
-            if (sortBy === "sceneryName") {
-                return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
-            } else if (sortBy === "country") {
-                return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
-            } else if (sortBy === "city") {
-                return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
-            }
-            return 0;
-        });
-
-        setUpload(sortedUpload);
+        setSorting(true);
+        try {
+            const sortedUpload = [...response].sort((a, b) => {
+                if (sortBy === "sceneryName") {
+                    return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
+                } else if (sortBy === "country") {
+                    return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
+                } else if (sortBy === "city") {
+                    return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
+                }
+                return 0;
+            });
+            setUpload(sortedUpload);
+        } catch (error) {
+            console.error('Error sorting uploads:', error);
+        } finally {
+            setSorting(false);
+        }
     };
 
     const handleSort = (criteria: string) => {
@@ -133,20 +142,23 @@ export default function MyUploadPage() {
                     overflowY: 'auto',
                 }}
             >
+                {sorting && (
+                    <CircularProgress
+                        size={40}
+                        style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                    />
+                )}
+                {upload.length === 0 && !sorting && (
+                    <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>
+                        You have't uploaded any scenery.
+                    </Typography>
+                )}
                 <Grid container spacing={2}>
-                    {upload.length === 0 ? (
-                        <Grid item xs={12}>
-                            <Typography variant="h4" align="center" sx={{ mt: 35 }}>
-                                You haven't uploaded any acenery.
-                            </Typography>
+                    {upload.length > 0 && currentItems.map(c => (
+                        <Grid item xs={4} key={c.sceneryId}>
+                            <SingleScenery scenery={c} />
                         </Grid>
-                    ) : (
-                        currentItems.map(u => (
-                            <Grid item xs={4} key={u.sceneryId}>
-                                <SingleScenery scenery={u} />
-                            </Grid>
-                        ))
-                    )}
+                    ))}
                 </Grid>
                 <Grid container justifyContent="center" sx={{ mt: 2 }}>
                     <Pagination

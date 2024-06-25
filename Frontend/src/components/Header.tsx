@@ -7,12 +7,12 @@ import DropdownMenu from "./DropdownMenu";
 
 const navStyle = { color: 'inherit', textDecoration: 'none', typography: 'h6', '&:hover': { color: 'grey.500' }, '&.active': { color: 'text.secondary' } }
 
-interface Props {
+export interface HeaderProps {
     darkMode: boolean;
     handleThemeChange: () => void;
 }
 
-export default function Header({ darkMode, handleThemeChange }: Props) {
+export default function Header({ darkMode, handleThemeChange }: HeaderProps) {
     const isLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
     const userName = useSelector((state: RootState) => state.auth.userName);
     const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function Header({ darkMode, handleThemeChange }: Props) {
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box display='flex' alignItems='center'>
                     <Typography variant='h4' component={NavLink} to="/" sx={navStyle}>Sceneries Sharing</Typography>
-                    <Switch checked={darkMode} onChange={handleThemeChange} />
+                    <Switch checked={darkMode} data-testid="dark-mode-switch" onChange={handleThemeChange} />
                 </Box>
 
                 <List sx={{ display: 'flex' }}>

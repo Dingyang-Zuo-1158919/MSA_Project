@@ -2,7 +2,7 @@ import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Circular
 import { Scenery } from "../models/Scenery";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-
+import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
 
 interface Props {
     scenery: Scenery;
@@ -10,23 +10,7 @@ interface Props {
 
 export default function SingleScenery({ scenery }: Props) {
     const [imageLoading, setImageLoading] = useState(true);
-
-    // convert Base64
-    const base64ImageData = scenery.imageData;
-    const byteCharacters = atob(base64ImageData);
-
-    // transfer to Uint8Array
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-
-    // generate Blob object
-    const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 这里的type要根据实际情况设置
-
-    // generate URL
-    const imageUrl = URL.createObjectURL(blob);
+    const imageUrl = ConvertByteToImageUrl(scenery);
 
     return ( 
         <Card style={{ display: 'flex', flexDirection: 'column' }}>

@@ -7,6 +7,8 @@ import agent from "../api/agent";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { Button, Grid, TextField, useTheme } from "@mui/material";
+import compressImage from 'browser-image-compression';
+import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
 
 export default function UpdatePage() {
     const theme = useTheme();
@@ -17,10 +19,13 @@ export default function UpdatePage() {
     const [country, setCountry] = useState<string>('');
     const [city, setCity] = useState<string>('');
     const [comment, setComment] = useState<string>('');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [image, setImage] = useState<string | undefined>(undefined);
     const [scenery, setScenery] = useState<Scenery | null>(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const token = useSelector((state: RootState) => state.auth.token);
+    const MAX_FILE_SIZE_MB = 1;
 
     useEffect(() => {
         if (Id) {
@@ -28,6 +33,8 @@ export default function UpdatePage() {
                 try {
                     const fetchedScenery = await agent.getSceneryById(Id);
                     setScenery(fetchedScenery);
+                    const imageUrl = ConvertByteToImageUrl(fetchedScenery);
+                    setImage(imageUrl);
                     setSceneryName(fetchedScenery.sceneryName);
                     setCountry(fetchedScenery.country);
                     setCity(fetchedScenery.city ?? "");
@@ -47,6 +54,33 @@ export default function UpdatePage() {
         setOpenSnackbar(false);
     };
 
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+
+            if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                try {
+                    const options = {
+                        maxSizeMB: MAX_FILE_SIZE_MB,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                    };
+                    const compressedFile = await compressImage(file, options);
+
+                    setSelectedFile(compressedFile);
+                    const imageUrl = URL.createObjectURL(compressedFile);
+                    setImage(imageUrl);
+                } catch (error) {
+                    console.error('Image compression error: ', error);
+                }
+            } else {
+                setSelectedFile(file);
+                const imageUrl = URL.createObjectURL(file);
+                setImage(imageUrl);
+            }
+        }
+    };
+
     const handleUpdate = async () => {
         try {
             if (!scenery) {
@@ -54,23 +88,33 @@ export default function UpdatePage() {
                 return;
             }
 
-            const updatedScenery = {
-                sceneryId: scenery.sceneryId,
-                sceneryName,
-                country,
-                city,
-                comment,
-                userId: scenery.userId,
-                imageData: scenery.imageData,
+            const formData = new FormData();
+            formData.append('SceneryName', sceneryName);
+            formData.append('Country', country);
+
+            if (city !== '') {
+                formData.append('City', city);
             };
+
+            if (selectedFile) {
+                formData.append('ImageData', selectedFile);
+            };
+
+            if (comment !== '') {
+                formData.append('Comment', comment);
+            };
+
+            formData.append('UserId', userId.toString());
+            formData.append('SceneryId', scenery.sceneryId);
 
             const config = {
                 headers: {
+                    'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
                 }
             };
 
-            const response = await agent.updateScenery(updatedScenery, config);
+            const response = await agent.updateScenery(formData, config);
 
             if (response.sceneryId) {
                 setSnackbarMessage("Upload successful!");
@@ -103,6 +147,13 @@ export default function UpdatePage() {
         <Grid container justifyContent="center" spacing={2} sx={{ mt: 10 }}>
             <form onSubmit={(e) => e.preventDefault()}>
                 <Grid item xs={12}>
+                    <Grid item xs={12}>
+                        <img src={image} alt="scenery image" style={{ width: '40%' }} />
+                    </Grid>
+                    <Grid item xs={12} sx={{ mb: 5 }}>
+                        <input type="file" onChange={handleFileChange} />
+                    </Grid>
+
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <TextField

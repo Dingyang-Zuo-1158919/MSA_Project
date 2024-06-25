@@ -38,7 +38,7 @@ const agent = {
     }
   },
 
-  updateScenery: async (sceneryUpdateRequest: any, config: AxiosRequestConfig) => {
+  updateScenery: async (sceneryUpdateRequest: FormData, config: AxiosRequestConfig) => {
     try {
       const response = await axios.put(`${API_URL}/Sceneries/Update`, sceneryUpdateRequest, {
         ...config,

@@ -88,7 +88,8 @@ namespace Backend.Controllers
         [Authorize]
         [Route("[action]")]
         [HttpPut]
-        public async Task<IActionResult> Update(SceneryUpdateRequest sceneryUpdateRequest)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Update([FromForm] SceneryUpdateRequest sceneryUpdateRequest)
         {
             var scenery = await _sceneriesService.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
             if (scenery == null)
@@ -100,26 +101,6 @@ namespace Backend.Controllers
             if (scenery.UserId != loggedInUserId)
             {
                 return Forbid(); // Return 403 Forbidden if not authorized
-            }
-
-            if (!string.IsNullOrEmpty(sceneryUpdateRequest.SceneryName))
-            {
-                scenery.SceneryName = sceneryUpdateRequest.SceneryName;
-            }
-
-            if (!string.IsNullOrEmpty(sceneryUpdateRequest.Country))
-            {
-                scenery.Country = sceneryUpdateRequest.Country;
-            }
-
-            if (!string.IsNullOrEmpty(sceneryUpdateRequest.City))
-            {
-                scenery.City = sceneryUpdateRequest.City;
-            }
-
-            if (!string.IsNullOrEmpty(sceneryUpdateRequest.Comment))
-            {
-                scenery.Comment = sceneryUpdateRequest.Comment;
             }
 
             if (!ModelState.IsValid)

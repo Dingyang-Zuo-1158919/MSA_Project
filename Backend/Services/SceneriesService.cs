@@ -53,12 +53,15 @@ namespace Backend.Services
             ArgumentNullException.ThrowIfNull(sceneryUpdateRequest);
             ValidationHelper.ModelValidation(sceneryUpdateRequest);
 
-            byte[] imageData;
+            byte[] imageData = null;
 
-            using (MemoryStream memoryStream = new MemoryStream())
+            if (sceneryUpdateRequest.ImageData != null)
             {
-                await sceneryUpdateRequest.ImageData.CopyToAsync(memoryStream);
-                imageData = memoryStream.ToArray();
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    await sceneryUpdateRequest.ImageData.CopyToAsync(memoryStream);
+                    imageData = memoryStream.ToArray();
+                }
             }
 
             Scenery matchingScenery = await _sceneriesRepository.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
@@ -69,7 +72,11 @@ namespace Backend.Services
             matchingScenery.Country = sceneryUpdateRequest.Country;
             matchingScenery.City = sceneryUpdateRequest.City;
             matchingScenery.Comment = sceneryUpdateRequest.Comment;
-            matchingScenery.ImageData = imageData;
+            if (imageData != null)
+            {
+                matchingScenery.ImageData = imageData;
+            }
+
 
             await _sceneriesRepository.UpdateScenery(matchingScenery);
 

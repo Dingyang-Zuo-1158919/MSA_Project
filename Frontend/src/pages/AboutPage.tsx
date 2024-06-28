@@ -220,7 +220,8 @@ export default function AboutPage() {
                 <br />
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
-                        <Button component={Link} disabled={!isLoggedIn} onClick={handleCollect} sx={{
+                        <Button component={Link} disabled={!isLoggedIn} data-testid="collect-button"
+                            onClick={handleCollect} sx={{
                             color: 'white', backgroundColor: '#a2cf6e', fontWeight: 'bold', fontSize: '15px',
                             border: "2px solid #a2cf6e",
                             '&:hover': {
@@ -258,7 +259,8 @@ export default function AboutPage() {
                 <br />
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
-                        <Button component={Link} disabled={!isLoggedIn || userId !== scenery.userId} onClick={() => navigate(`/update/${Id}`)} sx={{
+                        <Button component={Link} disabled={!isLoggedIn || userId !== scenery.userId}
+                            data-testid="update-button" onClick={() => navigate(`/update/${Id}`)} sx={{
                             color: "white", backgroundColor: "#ffc107", fontWeight: 'bold', fontSize: '15px',
                             border: "2px solid #ffc107",
                             '&:hover': {

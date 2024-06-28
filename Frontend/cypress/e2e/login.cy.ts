@@ -3,7 +3,7 @@ describe('Login Page', () => {
     cy.visit('/login');
   });
 
-  it('display login form elements', () => {
+  it('Display login form elements', () => {
     cy.get('h1').should('contain', 'Log in');
     cy.get('input[name="userName"]').should('exist');
     cy.get('input[name="password"]').should('exist');
@@ -11,14 +11,14 @@ describe('Login Page', () => {
     cy.get('a[href="/register"]').should('contain', "Don't have an account? Sign Up");
   });
 
-  it('show error for incorrect login', () => {
+  it('Display error for incorrect login', () => {
     cy.get('input[name="userName"]').type('invalidusername');
     cy.get('input[name="password"]').type('invalidpassword');
     cy.get('button[type="submit"]').click();
     cy.contains('Login failed: Request failed with status code 401').should('be.visible');
   });
 
-  it('log in successfully with correct credentials', () => {
+  it('Log in successfully with correct credentials', () => {
     cy.intercept('POST', `${Cypress.env('API_URL')}/Users/Login`, {
       statusCode: 200,
       body: {
@@ -37,12 +37,12 @@ describe('Login Page', () => {
     cy.contains('Welcome back, testuser').should('be.visible');
   });
 
-  it('navigate to registration page', () => {
+  it('Navigate to registration page', () => {
     cy.contains("Don't have an account? Sign Up").click();
     cy.url().should('include', '/register');
   });
 
-  it('should display success message after successful login', () => {
+  it('Display success message after successful login', () => {
     cy.intercept('POST', `${Cypress.env('API_URL')}/Users/Login`, {
       statusCode: 200,
       body: {

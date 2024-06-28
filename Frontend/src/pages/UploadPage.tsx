@@ -159,6 +159,7 @@ export default function UploadPage() {
                                 }}
                                 fullWidth
                                 sx={{ mb: 2 }}
+                                id="sceneryNameInput"
                             />
                             {sceneryNameTouched && !sceneryName && (
                                 <Typography variant="body2" sx={{ color: 'red' }}>Scenery Name can't be empty.</Typography>
@@ -177,6 +178,7 @@ export default function UploadPage() {
                                 }}
                                 fullWidth
                                 sx={{ mb: 2 }}
+                                id="countryInput"
                             />
                             {countryTouched && !country && (
                                 <Typography variant="body2" sx={{ color: 'red' }}>Country can't be empty.</Typography>
@@ -191,6 +193,7 @@ export default function UploadPage() {
                                 onChange={(e) => setCity(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 2 }}
+                                id="cityInput"
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -202,6 +205,7 @@ export default function UploadPage() {
                                 onChange={(e) => setComment(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 2 }}
+                                id="commentInput"
                             />
                         </Grid>
                         <Grid item xs={12}>

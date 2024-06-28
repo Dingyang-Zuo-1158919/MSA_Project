@@ -36,7 +36,7 @@ export default function RegisterPage() {
       if (error.response && error.response.status === 404) {
         errors = ["Registration failed: Resource not found"];
       } else if (error.response && error.response.status === 400) {
-        errors = ["Registration failed: Please set a strong password"];
+        errors = ["Registration failed: Please double check your register information"];
       } else {
         errors = [`Registration failed: ${error.message}`];
       }

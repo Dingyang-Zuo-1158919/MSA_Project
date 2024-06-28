@@ -23,14 +23,14 @@ describe('Header Navigatiion', () => {
     cy.url().should('include', '/');
   })
 
-  it('Shows login and register links when not logged in', () => {
+  it('Display login and register links when not logged in', () => {
     cy.get('a[href="/login"]').should('be.visible');
     cy.get('a[href="/register"]').should('be.visible');
     cy.visit('/upload');
     cy.url().should('include', '/login');
   });
 
-  it('Shows user-specific links when logged in', () => {
+  it('Display user-specific links when logged in', () => {
     cy.get('a[href="/login"]').click();
     const mockUsername = "testuser";
     const mockPassword = "TestPass123!";
@@ -44,7 +44,7 @@ describe('Header Navigatiion', () => {
     cy.get('a[href="/upload"]').should('be.visible');
   });
 
-  it('Logs out successfully', () => {
+  it('Log out successfully', () => {
     cy.get('a[href="/login"]').click();
     const mockUsername = "testuser";
     const mockPassword = "TestPass123!";
@@ -65,7 +65,7 @@ describe('Header Navigatiion', () => {
     cy.get('a[href="/sceneries"]').should('be.visible');
   });
 
-  it('Switches between dark and light mode', () => {
+  it('Switch between dark and light mode', () => {
     cy.get('body').should('have.css', 'background-color').and('match', /rgb\(234,\s*234,\s*234\)/); 
     cy.get('[data-testid="dark-mode-switch"]').click(); 
     cy.get('body').should('have.css', 'background-color').and('match', /rgb\(18,\s*18,\s*18\)/);

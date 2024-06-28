@@ -34,6 +34,7 @@
   "devDependencies": {
     "@storybook/cli": "^8.1.10",
     "@storybook/react": "^8.1.10",
+    "@testing-library/cypress": "^10.0.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@types/react-slick": "^0.23.13",

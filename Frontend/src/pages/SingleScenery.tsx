@@ -13,9 +13,10 @@ export default function SingleScenery({ scenery }: Props) {
     const imageUrl = ConvertByteToImageUrl(scenery);
 
     return ( 
-        <Card style={{ display: 'flex', flexDirection: 'column' }}>
+        <Card style={{ display: 'flex', flexDirection: 'column' }} className="single-scenery">
             <CardHeader
                 title={scenery.country}
+                className="scenery-country"
                 titleTypographyProps={{ 
                     sx: { fontWeight: 'bold', color: 'primary.main' }
                 }}
@@ -31,10 +32,10 @@ export default function SingleScenery({ scenery }: Props) {
             </CardMedia>
 
             <CardContent style={{ height:'10vh' }}>
-                <Typography gutterBottom color='secondary' variant="h5">
+                <Typography gutterBottom color='secondary' variant="h5" className="scenery-name">
                     {scenery.sceneryName}
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" color="text.secondary" className="scenery-city">
                     {scenery.city}
                 </Typography>
             </CardContent>

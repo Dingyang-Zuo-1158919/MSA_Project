@@ -117,7 +117,7 @@ export default function UpdatePage() {
             const response = await agent.updateScenery(formData, config);
 
             if (response.sceneryId) {
-                setSnackbarMessage("Upload successful!");
+                setSnackbarMessage("Update successful!");
                 setOpenSnackbar(true);
                 setTimeout(() => {
                     navigate(`/about/${scenery.sceneryId}`);
@@ -165,6 +165,7 @@ export default function UpdatePage() {
                                 onChange={(e) => setSceneryName(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 5 }}
+                                id="sceneryNameInput"
                             />
                             {!sceneryName && (
                                 <p style={{ color: 'red' }}>Scenery Name can't be empty.</p>
@@ -180,6 +181,7 @@ export default function UpdatePage() {
                                 onChange={(e) => setCountry(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 5 }}
+                                id="countryInput"
                             />
                             {!country && (
                                 <p style={{ color: 'red' }}>Country can't be empty.</p>
@@ -195,6 +197,7 @@ export default function UpdatePage() {
                                 onChange={(e) => setCity(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 5 }}
+                                id="cityInput"
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -206,6 +209,7 @@ export default function UpdatePage() {
                                 onChange={(e) => setComment(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 5 }}
+                                id="commentInput"
                             />
                         </Grid>
                     </Grid>

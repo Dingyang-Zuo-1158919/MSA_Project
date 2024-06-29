@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "CQo9z7+615g0LeAATAGd8UiIIJF6S4rtURyuHWDqCTha9D/03C1AwQgvXrM4cms+C5XtRGnQLf0lUNoOGlL69Q==",
+  "dgSpecHash": "r7EBHFJniaoOWo3O6wVKZSTKuYj6ADSGR5YNND96xc/9f9pmxPq8gq3Z/zvfNw+2twgJfqaY3w4V1YgXq+p7ow==",
   "success": true,
   "projectFilePath": "/Users/dingyangzuo/Desktop/programming/MSA_Project/Backend/Backend.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "/Users/dingyangzuo/.nuget/packages/azure.storage.blobs/12.20.0/azure.storage.blobs.12.20.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/azure.storage.common/12.19.0/azure.storage.common.12.19.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/bouncycastle.netcore/1.8.3/bouncycastle.netcore.1.8.3.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/google.protobuf/3.11.4/google.protobuf.3.11.4.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/k4os.compression.lz4/1.1.11/k4os.compression.lz4.1.1.11.nupkg.sha512",
@@ -48,6 +49,7 @@
     "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.abstractions/8.0.6/microsoft.entityframeworkcore.abstractions.8.0.6.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.analyzers/8.0.6/microsoft.entityframeworkcore.analyzers.8.0.6.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.design/8.0.6/microsoft.entityframeworkcore.design.8.0.6.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.inmemory/8.0.6/microsoft.entityframeworkcore.inmemory.8.0.6.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.relational/8.0.6/microsoft.entityframeworkcore.relational.8.0.6.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.sqlserver/8.0.6/microsoft.entityframeworkcore.sqlserver.8.0.6.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/microsoft.entityframeworkcore.tools/8.0.6/microsoft.entityframeworkcore.tools.8.0.6.nupkg.sha512",
@@ -85,6 +87,7 @@
     "/Users/dingyangzuo/.nuget/packages/microsoft.win32.registry/4.5.0/microsoft.win32.registry.4.5.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/microsoft.win32.systemevents/6.0.0/microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/mono.texttemplating/2.2.1/mono.texttemplating.2.2.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/moq/4.20.70/moq.4.20.70.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/mysql.data/8.0.22/mysql.data.8.0.22.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/mysql.data.entityframeworkcore/8.0.22/mysql.data.entityframeworkcore.8.0.22.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/netstandard.library/1.6.0/netstandard.library.1.6.0.nupkg.sha512",
@@ -115,6 +118,7 @@
     "/Users/dingyangzuo/.nuget/packages/system.console/4.0.0/system.console.4.0.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.diagnostics.debug/4.0.11/system.diagnostics.debug.4.0.11.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.diagnostics.diagnosticsource/6.0.1/system.diagnostics.diagnosticsource.6.0.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/system.diagnostics.eventlog/6.0.0/system.diagnostics.eventlog.6.0.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.diagnostics.tools/4.0.1/system.diagnostics.tools.4.0.1.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.diagnostics.tracesource/4.0.0/system.diagnostics.tracesource.4.0.0.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.diagnostics.tracing/4.1.0/system.diagnostics.tracing.4.1.0.nupkg.sha512",
@@ -193,7 +197,15 @@
     "/Users/dingyangzuo/.nuget/packages/system.xml.xdocument/4.0.11/system.xml.xdocument.4.0.11.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.xml.xmldocument/4.0.1/system.xml.xmldocument.4.0.1.nupkg.sha512",
     "/Users/dingyangzuo/.nuget/packages/system.xml.xpath/4.0.1/system.xml.xpath.4.0.1.nupkg.sha512",
-    "/Users/dingyangzuo/.nuget/packages/system.xml.xpath.xmldocument/4.0.1/system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
+    "/Users/dingyangzuo/.nuget/packages/system.xml.xpath.xmldocument/4.0.1/system.xml.xpath.xmldocument.4.0.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit/2.8.1/xunit.2.8.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.abstractions/2.0.3/xunit.abstractions.2.0.3.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.analyzers/1.14.0/xunit.analyzers.1.14.0.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.assert/2.8.1/xunit.assert.2.8.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.core/2.8.1/xunit.core.2.8.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.extensibility.core/2.8.1/xunit.extensibility.core.2.8.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.extensibility.execution/2.8.1/xunit.extensibility.execution.2.8.1.nupkg.sha512",
+    "/Users/dingyangzuo/.nuget/packages/xunit.runner.visualstudio/2.8.1/xunit.runner.visualstudio.2.8.1.nupkg.sha512"
   ],
   "logs": []
 }

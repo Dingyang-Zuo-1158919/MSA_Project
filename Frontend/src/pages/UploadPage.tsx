@@ -1,5 +1,5 @@
-import { Button, Grid, TextField, Typography, useTheme } from "@mui/material";
-import { useState } from "react";
+import { Button, Grid, MenuItem, TextField, Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { Navigate, useNavigate } from "react-router-dom";
@@ -11,6 +11,8 @@ import compressImage from 'browser-image-compression';
 export default function UploadPage() {
     const theme = useTheme();
     const navigate = useNavigate();
+    const [countries, setCountries] = useState<string[]>([]);
+    const [selectedCountry, setSelectedCountry] = useState<string>('');
     const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
     const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
     const [successSnackbarMessage, setSuccessSnackbarMessage] = useState('');
@@ -18,7 +20,6 @@ export default function UploadPage() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [image, setImage] = useState<string | undefined>(undefined);
     const [sceneryName, setSceneryName] = useState<string>('');
-    const [country, setCountry] = useState<string>('');
     const [city, setCity] = useState<string>('');
     const [comment, setComment] = useState<string>('');
     const userId = useSelector((state: RootState) => state.auth.userId);
@@ -28,6 +29,23 @@ export default function UploadPage() {
     const [countryTouched, setCountryTouched] = useState(false);
     const MAX_FILE_SIZE_MB = 1;
 
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch('https://restcountries.com/v3.1/independent?status=true');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch countries data');
+                }
+                const data = await response.json();
+
+                const fetchedCountries = data.map((country: any) => country.name.common);
+                setCountries(fetchedCountries);
+            } catch (error) {
+                console.error('Error fetching countries data', error);
+            }
+        };
+        fetchCountries();
+    }, []);
 
     const handleCloseSuccessSnackbar = () => {
         setOpenSuccessSnackbar(false);
@@ -58,8 +76,8 @@ export default function UploadPage() {
                 }
             } else {
                 setSelectedFile(file);
-                    const imageUrl = URL.createObjectURL(file);
-                    setImage(imageUrl);
+                const imageUrl = URL.createObjectURL(file);
+                setImage(imageUrl);
             }
         }
     };
@@ -76,7 +94,7 @@ export default function UploadPage() {
         try {
             const formData = new FormData();
             formData.append('SceneryName', sceneryName);
-            formData.append('Country', country);
+            formData.append('Country', selectedCountry);
 
             if (city !== '') {
                 formData.append('City', city);
@@ -104,7 +122,7 @@ export default function UploadPage() {
                 setSelectedFile(null);
                 setImage(undefined);
                 setSceneryName('');
-                setCountry('');
+                setSelectedCountry('');
                 setCity('');
                 setComment('');
                 setCountryTouched(false);
@@ -168,19 +186,25 @@ export default function UploadPage() {
                         <Grid item xs={12}>
                             <TextField
                                 variant='outlined'
+                                select
                                 required
-                                type='string'
                                 label='Country'
-                                value={country}
+                                value={selectedCountry}
                                 onChange={(e) => {
-                                    setCountry(e.target.value);
+                                    setSelectedCountry(e.target.value);
                                     setCountryTouched(true);
                                 }}
                                 fullWidth
                                 sx={{ mb: 2 }}
                                 id="countryInput"
-                            />
-                            {countryTouched && !country && (
+                            >
+                                {countries.map((country) => (
+                                    <MenuItem key={country} value={country}>
+                                        {country}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            {countryTouched && !selectedCountry && (
                                 <Typography variant="body2" sx={{ color: 'red' }}>Country can't be empty.</Typography>
                             )}
                         </Grid>
@@ -213,7 +237,7 @@ export default function UploadPage() {
                                 <Grid item xs={6}>
                                     <Button
                                         type="submit"
-                                        disabled={!sceneryName || !country}
+                                        disabled={!sceneryName || !selectedCountry}
                                         sx={{
                                             color: 'white',
                                             fontWeight: 'bold',

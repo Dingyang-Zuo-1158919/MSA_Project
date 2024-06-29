@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import LoadingComponent from './components/LoadingComponent';
 import router from './router/Routes';
+import AuthWrapper from './components/AuthWrapper';
 
 export default function App() {
   const [loading, setLoading] = useState(false);
@@ -30,11 +31,13 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <Header darkMode={darkMode} handleThemeChange={handleThemeChange} />
+        <Header darkMode={darkMode} handleThemeChange={handleThemeChange} isLoggedIn />
         {loading ? (<LoadingComponent message="Initializing app..." />)
           : (
             <Container sx={{ mt: 4 }}>
-              {router}
+              <AuthWrapper>
+                {router}
+              </AuthWrapper>
             </Container>
           )}
       </BrowserRouter>

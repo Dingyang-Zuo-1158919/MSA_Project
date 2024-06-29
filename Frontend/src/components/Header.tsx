@@ -10,6 +10,7 @@ const navStyle = { color: 'inherit', textDecoration: 'none', typography: 'h6', '
 export interface HeaderProps {
     darkMode: boolean;
     handleThemeChange: () => void;
+    isLoggedIn: boolean;
 }
 
 export default function Header({ darkMode, handleThemeChange }: HeaderProps) {

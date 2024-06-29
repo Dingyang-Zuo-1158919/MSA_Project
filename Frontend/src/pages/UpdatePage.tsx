@@ -6,7 +6,7 @@ import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { Button, Grid, TextField, useTheme } from "@mui/material";
+import { Button, Grid, MenuItem, TextField, useTheme } from "@mui/material";
 import compressImage from 'browser-image-compression';
 import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
 
@@ -26,6 +26,7 @@ export default function UpdatePage() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const token = useSelector((state: RootState) => state.auth.token);
     const MAX_FILE_SIZE_MB = 1;
+    const [countries, setCountries] = useState<string[]>([]);
 
     useEffect(() => {
         if (Id) {
@@ -48,6 +49,20 @@ export default function UpdatePage() {
             console.error('Scenery Id is empty or undefined.');
             navigate(`/about/${scenery?.sceneryId}`);
         }
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch('https://restcountries.com/v3.1/independent?status=true');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch countries data');
+                }
+                const data = await response.json();
+                const fetchedCountries = data.map((country: any) => country.name.common);
+                setCountries(fetchedCountries);
+            } catch (error) {
+                console.error('Error fetching countries data', error);
+            }
+        };
+        fetchCountries();
     }, [Id, navigate]);
 
     const handleCloseSnackbar = () => {
@@ -176,13 +191,20 @@ export default function UpdatePage() {
                                 variant='outlined'
                                 type='string'
                                 label='Country'
+                                select
                                 required
                                 value={country}
                                 onChange={(e) => setCountry(e.target.value)}
                                 fullWidth
                                 sx={{ mb: 5 }}
                                 id="countryInput"
-                            />
+                            >
+                                {countries.map((country) => (
+                                    <MenuItem key={country} value={country}>
+                                        {country}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                             {!country && (
                                 <p style={{ color: 'red' }}>Country can't be empty.</p>
                             )}

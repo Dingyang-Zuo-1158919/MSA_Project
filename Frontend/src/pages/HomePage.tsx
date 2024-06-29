@@ -10,15 +10,14 @@ export default function HomePage() {
     const settings = {
         dots: true,
         infinite: true,
-        speed: 50,
+        speed: 1000,
         slidesToShow: 1,
         slidesToScroll: 1,
-        prevArrow: <PrevArrow  />,
-        nextArrow: <NextArrow  />,
+        prevArrow: <PrevArrow />,
+        nextArrow: <NextArrow />,
     };
 
     return (
-
         <>
             <Slider {...settings}>
                 <div>

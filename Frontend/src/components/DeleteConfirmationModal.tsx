@@ -1,6 +1,6 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 
-interface Props {
+export interface Props {
     open: boolean;
     onClose: () => void;
     onConfirmDelete: () => void;

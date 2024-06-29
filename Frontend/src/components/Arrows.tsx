@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface ArrowProps {
+export interface ArrowProps {
     style?: React.CSSProperties; 
     onClick?: () => void; 
 }

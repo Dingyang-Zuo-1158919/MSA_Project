@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import agent from "../api/agent";
 import { Scenery } from "../models/Scenery";
 import SingleScenery from "./SingleScenery";
-import { Box, Button, CircularProgress, Grid, Pagination, Switch, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
 
 
 export default function SceneriesPage() {
@@ -13,6 +13,8 @@ export default function SceneriesPage() {
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     const [sorting, setSorting] = useState(false);
     const [selectedSortOption, setSelectedSortOption] = useState<string>("sceneryName");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredSceneries, setFilteredSceneries] = useState<Scenery[]>([]);
 
     useEffect(() => {
         fetchSceneries();
@@ -27,6 +29,20 @@ export default function SceneriesPage() {
         } catch (error) {
             console.error('Error fetching sceneries:', error);
         }
+    };
+
+    const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const query = event.target.value;
+        setSearchQuery(query);
+        filterSceneries(query);
+    };
+
+    const filterSceneries = (query: string) => {
+        const lowercasedQuery = query.toLowerCase();
+        const filteredData = sceneries.filter((item) =>
+            item.sceneryName.toLowerCase().includes(lowercasedQuery)
+        );
+        setFilteredSceneries(filteredData);
     };
 
     const sortSceneries = (sceneriesData: Scenery[], order: "asc" | "desc" = sortOrder) => {
@@ -68,7 +84,9 @@ export default function SceneriesPage() {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sceneries.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = searchQuery !== '' ?
+        filteredSceneries.slice(indexOfFirstItem, indexOfLastItem) :
+        sceneries.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -87,6 +105,17 @@ export default function SceneriesPage() {
                     justifyContent: 'flex-start',
                 }}
             >
+                <Typography variant='body1' sx={{ marginRight: 1, mb: 2 }}>
+                    Search&nbsp;Scenery&nbsp;Name:
+                </Typography>
+                <TextField
+                    label="Search by name"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    sx={{ marginBottom: 1 }}
+                />
+                <br />
                 <Typography variant='body1' sx={{ marginRight: 1, mb: 2 }}>
                     Sort&nbsp;By:
                 </Typography>
@@ -111,7 +140,7 @@ export default function SceneriesPage() {
                 >
                     City
                 </Button>
-
+                <br />
                 <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
                     <Typography variant='body1' sx={{ marginRight: 1 }}>
                         Sort&nbsp;Order: {sortOrder === "asc" ? "Ascending" : "Descending"}
@@ -141,8 +170,14 @@ export default function SceneriesPage() {
                         No scenery uploaded.
                     </Typography>
                 )}
+                {filteredSceneries.length === 0 && searchQuery !== '' && (
+                    <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>
+                        No matching scenery found.
+                    </Typography>
+                )}
+
                 <Grid container spacing={2}>
-                    {sceneries.length > 0 && currentItems.map(c => (
+                    {currentItems.map(c => (
                         <Grid item xs={4} key={c.sceneryId}>
                             <SingleScenery scenery={c} />
                         </Grid>
@@ -150,7 +185,7 @@ export default function SceneriesPage() {
                 </Grid>
                 <Grid container justifyContent="center" sx={{ mt: 2 }}>
                     <Pagination
-                        count={Math.ceil(sceneries.length / itemsPerPage)}
+                        count={Math.ceil((searchQuery !== '' ? filteredSceneries.length : sceneries.length) / itemsPerPage)}
                         page={currentPage}
                         onChange={handlePageChange}
                         color="primary"

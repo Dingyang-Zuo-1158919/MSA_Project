@@ -77,7 +77,6 @@ namespace Backend.Services
                 matchingScenery.ImageData = imageData;
             }
 
-
             await _sceneriesRepository.UpdateScenery(matchingScenery);
 
             return matchingScenery.ToSceneryResponse();
@@ -119,6 +118,12 @@ namespace Backend.Services
         public async Task<List<SceneryResponse>> GetAllSceneries()
         {
             var sceneries = await _sceneriesRepository.GetAllSceneries();
+
+            if (sceneries == null)
+            {
+                return new List<SceneryResponse>();
+            }
+
             return sceneries.Select(temp => temp.ToSceneryResponse()).ToList();
         }
     }

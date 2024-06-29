@@ -28,6 +28,11 @@ namespace Backend.Services
 
         public async Task<string> GenerateTokenAsync(User user)
         {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
             return await Task.Run(() =>
             {
                 var tokenHandler = new JwtSecurityTokenHandler();

@@ -20,7 +20,16 @@ namespace Backend.Services
 
         public async Task<bool> AddToCollection(int userId, Guid sceneryId)
         {
-            Console.WriteLine(userId.ToString(), sceneryId);
+            if (userId == default)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+            
+            if (sceneryId == default)
+            {
+                throw new ArgumentNullException(nameof(sceneryId));
+            }
+
             try
             {
                 var existingCollection = await _db.Collections.FirstOrDefaultAsync(c => c.UserId == userId && c.SceneryId == sceneryId);
@@ -57,6 +66,16 @@ namespace Backend.Services
 
         public async Task<bool> RemoveFromCollection(int userId, Guid sceneryId)
         {
+            if (userId == default(int))
+            {
+                throw new ArgumentNullException(nameof(userId), "User ID cannot be 0");
+            }
+
+            if (sceneryId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(sceneryId), "User ID cannot be 0");
+            }
+
             try
             {
                 var collection = await _db.Collections.FirstOrDefaultAsync(
@@ -79,7 +98,11 @@ namespace Backend.Services
 
         public async Task<List<Scenery>> GetUserCollection(int userId)
         {
-            Console.WriteLine("userid: " + userId);
+            if (userId == 0)
+            {
+                throw new ArgumentNullException(nameof(userId), "User ID cannot be null or 0");
+            }
+
             try
             {
                 var sceneries = await _db.Collections

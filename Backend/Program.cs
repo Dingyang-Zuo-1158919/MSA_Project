@@ -103,11 +103,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// app.UseCors(opt =>
-// {
-//     opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3024");
-// });
-
 app.UseCors("CorsPolicy");
 
 app.UseAuthentication();

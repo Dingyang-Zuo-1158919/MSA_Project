@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { PrevArrow, NextArrow } from '../components/Arrows';
 
 export default function HomePage() {
-
+    // Settings for the Slider component
     const settings = {
         dots: true,
         infinite: true,
@@ -19,6 +19,7 @@ export default function HomePage() {
 
     return (
         <>
+            {/* Slider component for image carousel */}
             <Slider {...settings}>
                 <div>
                     <img src='/assets/1.jpg' alt="hamilton" style={{ display: 'block', width: '100%', maxHeight: 800 }} />
@@ -36,11 +37,13 @@ export default function HomePage() {
                     <img src='/assets/5.jpg' alt="kagoshima" style={{ display: 'block', width: '100%', maxHeight: 800 }} />
                 </div>
             </Slider>
+            {/* Welcome message */}
             <Box display='flex' justifyContent='center' sx={{ p: 4 }}>
                 <Typography variant='h2'>
                     Welcome to share your sceneries!
                 </Typography>
             </Box>
+            {/* Link to sceneries page */}
             <Box display='flex' justifyContent='center' sx={{ p: 4 }}>
                 <Link to="/sceneries" style={{ textDecoration: 'none', color: '#007bff', fontSize: '1.2rem' }}>
                     {"Click to enjoy more!"}

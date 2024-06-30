@@ -19,6 +19,7 @@ namespace Backend.Tests
 {
     public class LoginTokenServiceTests
     {
+        // Mock configuration setup for JWT settings
         private Mock<IConfiguration> GetConfigurationMock()
         {
             var configuration = new Mock<IConfiguration>();
@@ -29,6 +30,7 @@ namespace Backend.Tests
             return configuration;
         }
 
+        // Mock UserManager setup for user management
         private Mock<UserManager<User>> GetUserManagerMock()
         {
             var store = new Mock<IUserStore<User>>();

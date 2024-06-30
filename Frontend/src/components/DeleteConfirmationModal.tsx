@@ -1,8 +1,11 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 
 export interface Props {
+    // Controls whether the modal is open or closed
     open: boolean;
+    // Callback function to handle modal close
     onClose: () => void;
+    // Callback function to handle delete confirmation
     onConfirmDelete: () => void;
 }
 
@@ -24,12 +27,14 @@ export default function DeleteConfirmationModal({open, onClose, onConfirmDelete}
                 boxShadow: 24,
                 p: 4,
             }}>
+                {/* Modal content */}
                 <Typography variant="h6" gutterBottom>
                     Confirm Delete
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                     Are you sure you want to delete this scenery?
                 </Typography>
+                {/* Buttons for cancel and delete actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                     <Button onClick={onClose} color="primary" sx={{ mr: 2 }}>
                         Cancel

@@ -14,17 +14,20 @@ using Backend.ServiceContracts.DTO;
 
 namespace Backend.Controllers
 {
+    // Controller for managing user collections of sceneries
     public class CollectionsController : BaseApiController
     {
         private readonly ILogger<CollectionsController> _logger;
         private readonly ICollectionsService _collectionsService;
 
+        // Constructor injection of logger and collections service
         public CollectionsController(ILogger<CollectionsController> logger, ICollectionsService collectionsService)
         {
             _logger = logger;
             _collectionsService = collectionsService;
         }
 
+        // Endpoint to add a scenery to a user's collection
         [Authorize]
         [Route("[action]")]
         [HttpPost]
@@ -49,6 +52,7 @@ namespace Backend.Controllers
             }
         }
 
+        // Endpoint to remove a scenery from a user's collection
         [Authorize]
         [Route("[action]")]
         [HttpDelete]
@@ -73,6 +77,7 @@ namespace Backend.Controllers
             }
         }
 
+        // Endpoint to retrieve a user's entire collection
         [Authorize]
         [Route("[action]")]
         [HttpGet]
@@ -90,6 +95,7 @@ namespace Backend.Controllers
             }
         }
 
+        // Endpoint to retrieve a specific scenery from a user's collection by ID
         [Authorize]
         [Route("[action]")]
         [HttpGet]
@@ -101,7 +107,7 @@ namespace Backend.Controllers
                 if (collection != null)
                     return Ok(collection);
                 else
-                    return Ok(null);
+                    return Ok(null); // Return null if collection not found
             }
             catch (Exception ex)
             {

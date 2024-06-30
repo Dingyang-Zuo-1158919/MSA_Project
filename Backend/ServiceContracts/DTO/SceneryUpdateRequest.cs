@@ -7,6 +7,7 @@ using Backend.Entities;
 
 namespace Backend.ServiceContracts.DTO
 {
+    // Represents the DTO class for updating a scenery.
     public class SceneryUpdateRequest
     {
         public Guid SceneryId { get; set; }
@@ -20,6 +21,7 @@ namespace Backend.ServiceContracts.DTO
         [Required]
         public int UserId { get; set; }
 
+        // Converts this object to a Scenery entity object.
         public Scenery ToScenery()
         {
             return new Scenery()
@@ -28,7 +30,6 @@ namespace Backend.ServiceContracts.DTO
                 SceneryName = SceneryName,
                 Country = Country,
                 City = City,
-                // ImageData = ImageData,
                 Comment = Comment,
                 UserId = UserId,
             };

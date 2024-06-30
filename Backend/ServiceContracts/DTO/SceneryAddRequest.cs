@@ -7,6 +7,7 @@ using Backend.Entities;
 
 namespace Backend.ServiceContracts.DTO
 {
+    // DTO class representing a request to add a new scenery
     public class SceneryAddRequest
     {
         [Required]
@@ -17,8 +18,9 @@ namespace Backend.ServiceContracts.DTO
         public string? Comment { get; set; }
         [Required]
         public int UserId { get; set; }
-        public IFormFile ImageData { get; set; }
+        public IFormFile ImageData { get; set; } // Represents the image data of the scenery
 
+        // Converts the DTO object to a Scenery entity object
         public Scenery ToScenery()
         {
             return new Scenery()
@@ -26,7 +28,6 @@ namespace Backend.ServiceContracts.DTO
                 SceneryName = this.SceneryName,
                 Country = this.Country,
                 City = this.City,
-                // ImageData = this.ImageData,
                 Comment = this.Comment,
                 UserId = this.UserId,
             };

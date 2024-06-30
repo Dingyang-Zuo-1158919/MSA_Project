@@ -6,6 +6,7 @@ import { Box, Button, CircularProgress, Grid, Pagination, Switch, TextField, Typ
 
 
 export default function SceneriesPage() {
+    // State variables
     const [sceneries, setSceneries] = useState<Scenery[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
@@ -16,10 +17,12 @@ export default function SceneriesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredSceneries, setFilteredSceneries] = useState<Scenery[]>([]);
 
+    // Fetch sceneries when component mounts or sort order changes
     useEffect(() => {
         fetchSceneries();
     }, [sortBy, sortOrder]);
 
+    // Fetch sceneries from API
     const fetchSceneries = async () => {
         try {
             setSorting(true);
@@ -31,12 +34,14 @@ export default function SceneriesPage() {
         }
     };
 
+    // Handle search input changes
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
         setSearchQuery(query);
         filterSceneries(query);
     };
 
+    // Filter sceneries based on search query
     const filterSceneries = (query: string) => {
         const lowercasedQuery = query.toLowerCase();
         const filteredData = sceneries.filter((item) =>
@@ -45,6 +50,7 @@ export default function SceneriesPage() {
         setFilteredSceneries(filteredData);
     };
 
+    // Sort sceneries based on selected criteria
     const sortSceneries = (sceneriesData: Scenery[], order: "asc" | "desc" = sortOrder) => {
         setSorting(true);
         try {
@@ -66,6 +72,7 @@ export default function SceneriesPage() {
         }
     };
 
+    // Handle sorting criteria change
     const handleSort = (criteria: string) => {
         if (criteria === selectedSortOption) {
             setSelectedSortOption("");
@@ -76,24 +83,28 @@ export default function SceneriesPage() {
         }
     };
 
+    // Handle sorting order change
     const handleSortOrder = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
         sortSceneries(sceneries, newSortOrder);
     }
 
+    // Calculate the items to be displayed on the current page
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = searchQuery !== '' ?
         filteredSceneries.slice(indexOfFirstItem, indexOfLastItem) :
         sceneries.slice(indexOfFirstItem, indexOfLastItem);
 
+    // Handle page change
     const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
 
     return (
         <div style={{ display: 'flex' }}>
+            {/* Sidebar for searching and sorting options */}
             <Box
                 sx={{
                     width: '20%',
@@ -105,6 +116,7 @@ export default function SceneriesPage() {
                     justifyContent: 'flex-start',
                 }}
             >
+                {/* Search functionality */}
                 <Typography variant='body1' sx={{ marginRight: 1, mb: 2 }}>
                     Search&nbsp;Scenery&nbsp;Name:
                 </Typography>
@@ -116,6 +128,7 @@ export default function SceneriesPage() {
                     sx={{ marginBottom: 1 }}
                 />
                 <br />
+                {/* Sort functionality */}
                 <Typography variant='body1' sx={{ marginRight: 1, mb: 2 }}>
                     Sort&nbsp;By:
                 </Typography>
@@ -141,6 +154,7 @@ export default function SceneriesPage() {
                     City
                 </Button>
                 <br />
+                {/* Switch for sorting order */}
                 <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
                     <Typography variant='body1' sx={{ marginRight: 1 }}>
                         Sort&nbsp;Order: {sortOrder === "asc" ? "Ascending" : "Descending"}
@@ -152,6 +166,7 @@ export default function SceneriesPage() {
                 </Box>
             </Box>
 
+            {/* Main content area */}
             <Box
                 sx={{
                     flex: '1',
@@ -159,23 +174,27 @@ export default function SceneriesPage() {
                     overflowY: 'auto',
                 }}
             >
+                {/* Display loading spinner while sorting */}
                 {sorting && (
                     <CircularProgress
                         size={40}
                         style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                     />
                 )}
+                {/* Display message if scenery list is empty */}
                 {sceneries.length === 0 && !sorting && (
                     <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>
                         No scenery uploaded.
                     </Typography>
                 )}
+                {/* Display message if filtered scenery list is empty */}
                 {filteredSceneries.length === 0 && searchQuery !== '' && (
                     <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>
                         No matching scenery found.
                     </Typography>
                 )}
 
+                {/* Display sorted/searched scenery items */}
                 <Grid container spacing={2}>
                     {currentItems.map(c => (
                         <Grid item xs={4} key={c.sceneryId}>
@@ -183,9 +202,13 @@ export default function SceneriesPage() {
                         </Grid>
                     ))}
                 </Grid>
+                {/* Pagination component */}
                 <Grid container justifyContent="center" sx={{ mt: 2 }}>
                     <Pagination
-                        count={Math.ceil((searchQuery !== '' ? filteredSceneries.length : sceneries.length) / itemsPerPage)}
+                        count={Math.ceil((searchQuery !== '' ?
+                            filteredSceneries.length :
+                            sceneries.length)
+                            / itemsPerPage)}
                         page={currentPage}
                         onChange={handlePageChange}
                         color="primary"

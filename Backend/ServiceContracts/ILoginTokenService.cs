@@ -8,8 +8,10 @@ using Backend.Entities;
 
 namespace Backend.ServiceContracts
 {
+    // Interface defining service contract for generating JWT tokens for user authentication
     public interface ILoginTokenService
     {
+        // Generates a JWT token for the specified user
         Task<string> GenerateTokenAsync(User user);
     }
 }

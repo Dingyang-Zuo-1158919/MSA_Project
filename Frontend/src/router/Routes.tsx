@@ -10,6 +10,7 @@ import UpdatePage from '../pages/UpdatePage';
 import MyCollectionPage from '../pages/MyCollectionPage';
 import MyUploadPage from '../pages/MyUploadPage';
 
+// Define the routing configuration using React Router's <Routes> and <Route> components
 const router = (
   <Routes>
     <Route path="/" element={<HomePage />} />

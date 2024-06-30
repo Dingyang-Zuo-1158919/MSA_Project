@@ -11,20 +11,27 @@ export default {
   component: DropdownMenu,
 } as Meta;
 
-const theme = createTheme(); 
+// Create a default MUI theme
+const theme = createTheme();
 
+// Mock Redux store with a getState function to simulate the state
 const mockStore = {
   getState: () => ({
     auth: {
-      userId: 2, 
+      // Simulated userId for authentication state
+      userId: 2,
     },
   } as RootState),
-  subscribe: () => {},
+  // Placeholder subscribe function
+  subscribe: () => { },
+  // Action for Storybook logging
   dispatch: action('dispatch'),
 };
 
+// Template component for Storybook
 const Template: StoryFn = () => (
   <BrowserRouter>
+    {/* Provide the mock Redux store */}
     <Provider store={mockStore as any}>
       <ThemeProvider theme={theme}>
         <DropdownMenu />
@@ -33,4 +40,5 @@ const Template: StoryFn = () => (
   </BrowserRouter>
 );
 
+// Story for the default state of the DropdownMenu
 export const Default = Template.bind({});

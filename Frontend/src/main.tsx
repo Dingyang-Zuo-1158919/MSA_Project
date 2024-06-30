@@ -5,6 +5,7 @@ import App from './App.tsx';
 import store from './Redux/store.ts';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
+  // Provider component makes the Redux store available to the rest of the app
   <Provider store={store}>
     <React.StrictMode>
       <App />

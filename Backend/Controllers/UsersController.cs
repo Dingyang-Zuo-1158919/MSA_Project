@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Controllers
 {
+    // Controller for user authentication and management
     public class UsersController : BaseApiController
     {
         private readonly ILogger<UsersController> _logger;
@@ -20,6 +21,7 @@ namespace Backend.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ILoginTokenService _loginTokenService;
 
+        // Constructor injection of logger, UserManager, SignInManager, and LoginTokenService
         public UsersController(ILogger<UsersController> logger, UserManager<User> userManager, SignInManager<User> signInManager, ILoginTokenService loginTokenService)
         {
             _logger = logger;
@@ -28,18 +30,22 @@ namespace Backend.Controllers
             _loginTokenService = loginTokenService;
         }
 
+        // Endpoint for user registration
         [Route("[action]")]
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
+                // Create a new User object based on the registration model
                 var user = new User { UserName = model.UserName, Email = model.Email };
-
+                
+                // Attempt to create the user with the provided password
                 if (model.Password != null)
                 {
                     var result = await _userManager.CreateAsync(user, model.Password);
 
+                    // If user creation is successful, sign in the user and return user details
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
@@ -61,15 +67,19 @@ namespace Backend.Controllers
             }
         }
 
+        // Endpoint for user login
         [Route("[action]")]
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
+            // Validate model state and credentials
             if (ModelState.IsValid && !string.IsNullOrEmpty(model.UserName) && !string.IsNullOrEmpty(model.Password))
             {
+                // Attempt to sign in the user with provided credentials
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, isPersistent: false, lockoutOnFailure: false);
                 _logger.LogInformation($"SignIn result: {result}");
                 
+                // If sign-in is successful, generate and return a JWT token
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.UserName);

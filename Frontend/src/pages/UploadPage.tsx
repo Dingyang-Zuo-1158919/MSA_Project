@@ -1,5 +1,6 @@
-import { Button, Grid, MenuItem, TextField, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Button, Grid, IconButton, MenuItem, TextField, Typography, useTheme } from "@mui/material";
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import { useEffect, useRef, useState } from "react";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { Navigate, useNavigate } from "react-router-dom";
@@ -10,7 +11,13 @@ import compressImage from 'browser-image-compression';
 
 export default function UploadPage() {
     const theme = useTheme();
+    // Navigation hook
     const navigate = useNavigate();
+    // Get user information from Redux store
+    const userId = useSelector((state: RootState) => state.auth.userId);
+    const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+    const token = useSelector((state: RootState) => state.auth.token);
+    // State variables
     const [countries, setCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<string>('');
     const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
@@ -22,14 +29,16 @@ export default function UploadPage() {
     const [sceneryName, setSceneryName] = useState<string>('');
     const [city, setCity] = useState<string>('');
     const [comment, setComment] = useState<string>('');
-    const userId = useSelector((state: RootState) => state.auth.userId);
-    const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-    const token = useSelector((state: RootState) => state.auth.token);
+    // State to track if fields have been touched for validation
     const [sceneryNameTouched, setSceneryNameTouched] = useState(false);
     const [countryTouched, setCountryTouched] = useState(false);
+    // Maximum image file size allowed in MB
     const MAX_FILE_SIZE_MB = 1;
+    // Ref for file input
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        // Fetch countries list for user to select from Rest Countries API
         const fetchCountries = async () => {
             try {
                 const response = await fetch('https://restcountries.com/v3.1/independent?status=true');
@@ -47,18 +56,30 @@ export default function UploadPage() {
         fetchCountries();
     }, []);
 
+    // Closing success snackbar
     const handleCloseSuccessSnackbar = () => {
         setOpenSuccessSnackbar(false);
     };
 
+    // Closing error snackbar
     const handleCloseErrorSnackbar = () => {
         setOpenErrorSnackbar(false);
     };
 
+    // Handle file input change (including image compression if needed)
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
 
+            // Validate file type
+            if (!file.type.match('image/jpeg')) {
+                console.error('Only JPEG files are allowed.');
+                setErrorSnackbarMessage("Only JPEG files are allowed.");
+                setOpenErrorSnackbar(true);
+                return;
+            }
+
+            //Compress image if oversize
             if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
                 try {
                     const options = {
@@ -82,6 +103,7 @@ export default function UploadPage() {
         }
     };
 
+    // Handle scenery upload
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
@@ -109,16 +131,19 @@ export default function UploadPage() {
             };
 
             formData.append('UserId', userId.toString());
+            // Configure headers with authorization token
             const config = {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
                 }
             };
+            // Make API call to add scenery
             const response = await agent.addScenery(formData, config);
             if (response.sceneryId) {
                 setSuccessSnackbarMessage("Upload successful!");
                 setOpenSuccessSnackbar(true);
+                // Clear form fields and state
                 setSelectedFile(null);
                 setImage(undefined);
                 setSceneryName('');
@@ -146,25 +171,48 @@ export default function UploadPage() {
         }
     }
 
+    // Handle image deletion
+    const handleDeleteImage = () => {
+        setSelectedFile(null);
+        setImage(undefined);
+        // Reset file input field
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    // Redirect to login page if not logged in
     if (!isLoggedIn) {
         return <Navigate to="/login" />;
     }
 
     return (
         <Grid container spacing={6} sx={{ mt: 10, ml: 20 }}>
+            {/* Form submission handling */}
             <form onSubmit={handleSubmit}>
+                {/* Displaying the selected image */}
                 <Grid item xs={6}>
-                    <img src={image} alt="scenery image" style={{ width: '100%', maxWidth: '100%' }} />
+                    {image && (
+                        <>
+                            <img src={image} alt="scenery image" style={{ width: '100%', maxWidth: '100%' }} />
+                            <IconButton onClick={handleDeleteImage} sx={{ position: 'relative', mb: '8px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </>
+                    )}
                 </Grid>
                 <Grid item xs={6}>
                     <Grid container spacing={2}>
+                        {/* Input for selecting an image file */}
                         <Grid item xs={12}>
-                            <input type="file" onChange={handleFileChange} />
+                            <input ref={fileInputRef} type="file" accept="image/jpeg" onChange={handleFileChange} />
+                            {/* Validation message if file is empty */}
                             {selectedFile === null && (
-                                <Typography variant="body2" sx={{ color: 'blue', mt: 1 }}>Please select a file.</Typography>
+                                <Typography variant="body2" sx={{ color: 'blue', mt: 1 }}>Please select a JPEG image for uploading.</Typography>
                             )}
                         </Grid>
                         <Grid item xs={12}>
+                            {/* Text field for scenery name */}
                             <TextField
                                 variant='outlined'
                                 required
@@ -179,10 +227,12 @@ export default function UploadPage() {
                                 sx={{ mb: 2 }}
                                 id="sceneryNameInput"
                             />
+                            {/* Validation message if scenery name is empty after handling */}
                             {sceneryNameTouched && !sceneryName && (
                                 <Typography variant="body2" sx={{ color: 'red' }}>Scenery Name can't be empty.</Typography>
                             )}
                         </Grid>
+                        {/* Dropdown for selecting country */}
                         <Grid item xs={12}>
                             <TextField
                                 variant='outlined'
@@ -198,12 +248,14 @@ export default function UploadPage() {
                                 sx={{ mb: 2 }}
                                 id="countryInput"
                             >
+                                {/* Mapping countries to options */}
                                 {countries.map((country) => (
                                     <MenuItem key={country} value={country}>
                                         {country}
                                     </MenuItem>
                                 ))}
                             </TextField>
+                            {/* Validation message if country is empty after handling */}
                             {countryTouched && !selectedCountry && (
                                 <Typography variant="body2" sx={{ color: 'red' }}>Country can't be empty.</Typography>
                             )}
@@ -232,9 +284,11 @@ export default function UploadPage() {
                                 id="commentInput"
                             />
                         </Grid>
+                        {/* Buttons for uploading and returning */}
                         <Grid item xs={12}>
                             <Grid container spacing={2}>
                                 <Grid item xs={6}>
+                                    {/* Upload button */}
                                     <Button
                                         type="submit"
                                         disabled={!sceneryName || !selectedCountry}
@@ -254,6 +308,7 @@ export default function UploadPage() {
                                     </Button>
                                 </Grid>
                                 <Grid item xs={6}>
+                                    {/* Return button */}
                                     <Button
                                         onClick={() => navigate('/')}
                                         sx={{
@@ -274,7 +329,9 @@ export default function UploadPage() {
                             </Grid>
                         </Grid>
                     </Grid>
+
                     <Grid container spacing={2}>
+                        {/* Snackbar for displaying success message */}
                         <Grid item xs={12}>
                             <Snackbar open={openSuccessSnackbar} autoHideDuration={6000} onClose={handleCloseSuccessSnackbar}>
                                 <MuiAlert onClose={handleCloseSuccessSnackbar} severity="success" sx={{ width: '100%', backgroundColor: theme.palette.success.main, color: 'white', fontWeight: 'bold' }}>
@@ -282,6 +339,7 @@ export default function UploadPage() {
                                 </MuiAlert>
                             </Snackbar>
                         </Grid>
+                        {/* Snackbar for displaying error message */}
                         <Grid item xs={12}>
                             <Snackbar open={openErrorSnackbar} autoHideDuration={6000} onClose={handleCloseErrorSnackbar}>
                                 <MuiAlert onClose={handleCloseErrorSnackbar} severity="error" sx={{ width: '100%', backgroundColor: theme.palette.error.main, color: 'white', fontWeight: 'bold' }}>

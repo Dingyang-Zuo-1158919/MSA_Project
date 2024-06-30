@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Backend.ServiceContracts.DTO
 {
+    // DTO for adding a scenery to a user's collection.
     public class AddToCollectionRequest
     {
         public int UserId { get; set; }

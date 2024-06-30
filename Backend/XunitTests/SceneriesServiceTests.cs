@@ -27,6 +27,7 @@ namespace Backend.Tests
 
             var service = new SceneriesService(mockSceneriesRepository.Object, mockConfiguration.Object);
 
+            // Create a valid scenery addition request
             var request = new SceneryAddRequest
             {
                 SceneryName = "Test Scenery",
@@ -37,6 +38,7 @@ namespace Backend.Tests
                 UserId = 1
             };
 
+            // Setup repository mock behavior for adding scenery
             mockSceneriesRepository.Setup(repo => repo.AddScenery(It.IsAny<Scenery>()))
                                    .Returns<Scenery>(scenery =>
                                    {
@@ -86,6 +88,7 @@ namespace Backend.Tests
 
             var service = new SceneriesService(mockSceneriesRepository.Object, mockConfiguration.Object);
 
+            // Create an invalid scenery addition request (missing SceneryName)
             var request = new SceneryAddRequest
             {
                 SceneryName = null,
@@ -117,6 +120,7 @@ namespace Backend.Tests
 
             var service = new SceneriesService(mockSceneriesRepository.Object, mockConfiguration.Object);
 
+            // Create a valid scenery update request
             var request = new SceneryUpdateRequest
             {
                 SceneryId = Guid.NewGuid(),
@@ -126,7 +130,8 @@ namespace Backend.Tests
                 ImageData = new FormFile(new MemoryStream(new byte[0]), 0, 0, "ImageData", "image.jpg"),
                 Comment = "Updated Comment"
             };
-
+            
+            // Setup repository mock behavior for retrieving and updating scenery
             mockSceneriesRepository.Setup(repo => repo.GetSceneryBySceneryId(request.SceneryId))
                                    .ReturnsAsync(new Scenery { SceneryId = request.SceneryId });
 
@@ -182,6 +187,7 @@ namespace Backend.Tests
 
             var service = new SceneriesService(mockSceneriesRepository.Object, mockConfiguration.Object);
 
+            // Create an invalid scenery update request (missing SceneryName)
             var request = new SceneryUpdateRequest
             {
                 SceneryId = Guid.NewGuid(),
@@ -215,6 +221,7 @@ namespace Backend.Tests
 
             Guid sceneryIdToBeDeleted = Guid.NewGuid();
 
+            // Setup repository mock behavior for deleting existing scenery
             mockSceneriesRepository.Setup(repo => repo.GetSceneryBySceneryId(sceneryIdToBeDeleted))
                                    .ReturnsAsync(new Scenery { SceneryId = sceneryIdToBeDeleted });
 
@@ -241,6 +248,7 @@ namespace Backend.Tests
 
             Guid nonExistingSceneryId = Guid.NewGuid();
 
+            // Setup repository mock behavior for attempting to delete non-existing scenery
             mockSceneriesRepository.Setup(repo => repo.GetSceneryBySceneryId(nonExistingSceneryId))
                                    .ReturnsAsync((Scenery)null);
 
@@ -274,6 +282,7 @@ namespace Backend.Tests
                 UserId = 1
             };
 
+            // Setup repository mock behavior for retrieving scenery by ID
             mockSceneriesRepository.Setup(repo => repo.GetSceneryBySceneryId(sceneryId))
                                    .ReturnsAsync(expectedScenery);
 
@@ -301,6 +310,7 @@ namespace Backend.Tests
 
             Guid nonExistingSceneryId = Guid.NewGuid();
 
+            // Setup repository mock behavior for retrieving non-existing scenery
             mockSceneriesRepository.Setup(repo => repo.GetSceneryBySceneryId(nonExistingSceneryId))
                                    .ReturnsAsync((Scenery)null);
 
@@ -347,6 +357,7 @@ namespace Backend.Tests
                 }
             };
 
+            // Setup repository mock behavior for retrieving sceneries by user ID
             mockSceneriesRepository.Setup(repo => repo.GetSceneriesByUserId(userId))
                                    .ReturnsAsync(expectedSceneries);
 
@@ -373,6 +384,7 @@ namespace Backend.Tests
 
             int userId = 1;
 
+            // Setup repository mock behavior for retrieving null sceneries by user ID
             mockSceneriesRepository.Setup(repo => repo.GetSceneriesByUserId(userId))
                                    .ReturnsAsync((List<Scenery>)null);
 
@@ -396,6 +408,7 @@ namespace Backend.Tests
 
             int nonExistingUserId = 10000;
 
+            // Setup repository mock behavior for retrieving null sceneries by non-existing user ID
             mockSceneriesRepository.Setup(repo => repo.GetSceneriesByUserId(nonExistingUserId))
                                    .ReturnsAsync((List<Scenery>)null);
 
@@ -440,6 +453,7 @@ namespace Backend.Tests
                 }
             };
 
+            // Setup repository mock behavior for retrieving all sceneries
             mockSceneriesRepository.Setup(repo => repo.GetAllSceneries())
                                    .ReturnsAsync(expectedSceneries);
 
@@ -464,6 +478,7 @@ namespace Backend.Tests
 
             var service = new SceneriesService(mockSceneriesRepository.Object, mockConfiguration.Object);
 
+            // Setup repository mock behavior for retrieving null sceneries
             mockSceneriesRepository.Setup(repo => repo.GetAllSceneries())
                                    .ReturnsAsync((List<Scenery>)null);
 

@@ -22,10 +22,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+// Register services and repositories for dependency injection.
 builder.Services.AddScoped<ISceneriesService, SceneriesService>();
 builder.Services.AddScoped<ISceneriesRepository, SceneriesRepository>();
 builder.Services.AddScoped<ICollectionsService, CollectionsService>();
 
+// Configure the application's DbContext with SQL Server and retry policy.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDbContext"),
@@ -37,16 +39,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     );
 });
 
+// Configure CORS policy for allowing requests from specified origins.
 builder.Services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy",
             builder => builder
-                .WithOrigins("http://localhost:3024")
+                .WithOrigins("http://localhost:3024", "http://localhost:3500")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
     });
 
+// Configure Identity with custom password policies and JWT authentication.
 builder.Services.AddIdentity<User, IdentityRole<int>>(opt =>
 {
     opt.SignIn.RequireConfirmedAccount = false;
@@ -59,6 +63,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(opt =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Configure JWT authentication scheme.
 string secretKey = builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JwtSettings:SecretKey is missing or empty in configuration.");
 string issuer = builder.Configuration["JwtSettings:Issuer"] ?? throw new InvalidOperationException("JwtSettings:Issuer is missing or empty in configuration.");
 string audience = builder.Configuration["JwtSettings:Audience"] ?? throw new InvalidOperationException("JwtSettings:Audience is missing or empty in configuration.");
@@ -77,6 +82,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             };
         });
 
+// Configure default authorization policy requiring authentication.
 builder.Services.AddAuthorization(options =>
 {
     options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
@@ -84,11 +90,14 @@ builder.Services.AddAuthorization(options =>
     .Build();
 });
 
+// Register custom service for generating login tokens.
 builder.Services.AddScoped<ILoginTokenService, LoginTokenService>();
 
+// Add API explorer and Swagger generation.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure logging to include console output.
 builder.Logging.AddConsole();
 
 var app = builder.Build();
@@ -96,10 +105,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Enable Swagger UI for development environment.
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Configure middleware for HTTPS redirection, routing, CORS, authentication, and authorization.
 app.UseHttpsRedirection();
 app.UseRouting();
 
@@ -108,6 +119,8 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map controllers endpoints.
 app.MapControllers();
 
+// Start the application.
 app.Run();

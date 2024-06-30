@@ -7,6 +7,7 @@ using Backend.Entities;
 
 namespace Backend.ServiceContracts.DTO
 {
+    // Represents the DTO class for a scenery response.
     public class SceneryResponse
     {
         public Guid SceneryId { get; set; }
@@ -20,6 +21,7 @@ namespace Backend.ServiceContracts.DTO
         [Required]
         public int UserId { get; set; }
 
+        // Converts this object to a SceneryUpdateRequest object.
         public SceneryUpdateRequest ToSceneryUpdateRequest()
         {
             return new SceneryUpdateRequest
@@ -28,15 +30,16 @@ namespace Backend.ServiceContracts.DTO
                 SceneryName = SceneryName,
                 Country = Country,
                 City = City,
-                // ImageData = ImageData,
                 Comment = Comment,
                 UserId = UserId,
             };
         }
     }
 
+    // Extension methods for Scenery entity class.
     public static class SceneryExtensions
     {
+        // Converts a Scenery entity object to a SceneryResponse DTO object.
         public static SceneryResponse ToSceneryResponse(this Scenery scenery)
         {
             return new SceneryResponse()

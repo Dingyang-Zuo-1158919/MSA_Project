@@ -10,19 +10,29 @@ import { RootState } from "../Redux/store";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 export default function AboutPage() {
+    // State to manage the Snackbar visibility and message
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    // Get the scenery ID from the URL parameters
     const { Id } = useParams<{ Id: string }>();
+    // State to store the scenery details
     const [scenery, setScenery] = useState<Scenery | null>(null);
+    // Theme for styling
     const theme = useTheme();
+    // Navigation hook
     const navigate = useNavigate();
+    // Get user information from Redux store
     const userId = useSelector((state: RootState) => state.auth.userId);
     const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
-    const [isCollected, setIsCollected] = useState(false);
     const token = useSelector((state: RootState) => state.auth.token);
+    // State to manage the collection status
+    const [isCollected, setIsCollected] = useState(false);
+    // State to manage the modal visibility
     const [openModal, setOpenModal] = useState(false);
+    // State to manage loading status
     const [loading, setLoading] = useState(false);
 
+    // Fetch the scenery details when the component mounts or dependencies change
     useEffect(() => {
         const fetchScenery = async () => {
             try {
@@ -34,6 +44,7 @@ export default function AboutPage() {
                 const fetchedScenery = await agent.getSceneryById(Id);
                 setScenery(fetchedScenery);
 
+                // Check if the scenery is already collected by the user
                 const config = {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -54,6 +65,7 @@ export default function AboutPage() {
         fetchScenery();
     }, [userId, Id, token])
 
+    // Open and close handlers for the modal
     const handleOpenModal = () => {
         setOpenModal(true);
     };
@@ -62,10 +74,12 @@ export default function AboutPage() {
         setOpenModal(false);
     };
 
+    // Close handler for the Snackbar
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
 
+    // Handle adding/removing scenery from the collection
     const handleCollect = async () => {
         try {
             if (!isLoggedIn) {
@@ -103,6 +117,7 @@ export default function AboutPage() {
         }
     }
 
+    // Handle deleting the scenery
     const handleDelete = async () => {
         try {
             if (!isLoggedIn) {
@@ -151,6 +166,7 @@ export default function AboutPage() {
         }
     }
 
+    // Render loading state if scenery ID or scenery details are not available
     if (!Id) {
         return <div>No scenery ID provided.</div>;
     }
@@ -168,23 +184,16 @@ export default function AboutPage() {
         );
     };
 
-    // convert Base64
+    // Convert Base64 image data to a Blob and generate a URL for it
     const base64ImageData = scenery.imageData;
     const byteCharacters = atob(base64ImageData);
-
-    // transfer to Uint8Array
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-
-    // generate Blob object
-    const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 这里的type要根据实际情况设置
-
-    // generate URL
+    const blob = new Blob([byteArray], { type: 'image/jpeg' });
     const imageUrl = URL.createObjectURL(blob);
-
 
     return (
         <Grid container spacing={6} sx={{ mt: 15 }}>
@@ -206,6 +215,7 @@ export default function AboutPage() {
                 </Grid>
                 <Divider sx={{ mb: 3 }} />
 
+                {/* Snackbar for notifications */}
                 <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                     <MuiAlert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
                         {snackbarMessage}
@@ -220,6 +230,7 @@ export default function AboutPage() {
                 <br />
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
+                        {/* Collect/Collected button */}
                         <Button component={Link} disabled={!isLoggedIn} data-testid="collect-button"
                             onClick={handleCollect} sx={{
                             color: 'white', backgroundColor: '#a2cf6e', fontWeight: 'bold', fontSize: '15px',
@@ -232,6 +243,7 @@ export default function AboutPage() {
                         }}>{isCollected ? 'Collected' : 'Collect'}</Button>
                     </Grid>
                     <Grid item xs={6}>
+                        {/* Return button */}
                         <Button
                             onClick={() => navigate("/sceneries")}
                             sx={{
@@ -259,6 +271,7 @@ export default function AboutPage() {
                 <br />
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
+                        {/* Update button */}
                         <Button component={Link} disabled={!isLoggedIn || userId !== scenery.userId}
                             data-testid="update-button" onClick={() => navigate(`/update/${Id}`)} sx={{
                             color: "white", backgroundColor: "#ffc107", fontWeight: 'bold', fontSize: '15px',
@@ -272,6 +285,7 @@ export default function AboutPage() {
                     </Grid>
 
                     <Grid item xs={6}>
+                        {/* Delete button */}
                         <Button onClick={handleOpenModal} disabled={!isLoggedIn || userId !== scenery.userId} sx={{
                             color: theme.palette.error.contrastText, backgroundColor: "#f6685e", fontWeight: 'bold', fontSize: '15px',
                             border: "2px solid #f6685e",
@@ -281,6 +295,7 @@ export default function AboutPage() {
                                 border: `2px solid ${theme.palette.error.main}`,
                             }
                         }}>Delete</Button>
+                        {/* Delete confirmation modal */}
                         <DeleteConfirmationModal
                             open={openModal}
                             onClose={handleCloseModal}

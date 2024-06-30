@@ -1,20 +1,26 @@
 import { RootState } from "../Redux/store";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { Button, Grid, MenuItem, TextField, useTheme } from "@mui/material";
+import { Button, Grid, IconButton, MenuItem, TextField, Typography, useTheme } from "@mui/material";
+import { Delete as DeleteIcon } from '@mui/icons-material';
 import compressImage from 'browser-image-compression';
 import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
 
 export default function UpdatePage() {
     const theme = useTheme();
+    // Get the scenery ID from the URL parameters
     const { Id } = useParams<{ Id: string }>();
+    // Navigation hook
     const navigate = useNavigate();
+    // Get user information from Redux store
     const userId = useSelector((state: RootState) => state.auth.userId);
+    const token = useSelector((state: RootState) => state.auth.token);
+    // State variables
     const [sceneryName, setSceneryName] = useState<string>('');
     const [country, setCountry] = useState<string>('');
     const [city, setCity] = useState<string>('');
@@ -24,10 +30,13 @@ export default function UpdatePage() {
     const [scenery, setScenery] = useState<Scenery | null>(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const token = useSelector((state: RootState) => state.auth.token);
-    const MAX_FILE_SIZE_MB = 1;
     const [countries, setCountries] = useState<string[]>([]);
+    // Maximum image file size allowed in MB
+    const MAX_FILE_SIZE_MB = 1;
+    // Ref for file input
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Fetch scenery data and countries list on component mount or when ID changes
     useEffect(() => {
         if (Id) {
             const fetchScenery = async () => {
@@ -49,6 +58,7 @@ export default function UpdatePage() {
             console.error('Scenery Id is empty or undefined.');
             navigate(`/about/${scenery?.sceneryId}`);
         }
+        // Fetch countries list for user to select from Rest Countries API
         const fetchCountries = async () => {
             try {
                 const response = await fetch('https://restcountries.com/v3.1/independent?status=true');
@@ -65,14 +75,25 @@ export default function UpdatePage() {
         fetchCountries();
     }, [Id, navigate]);
 
+    // Close snackbar handler
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
 
+    // Handle file input change (including image compression if needed)
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
 
+            // Validate file type
+            if (!file.type.match('image/jpeg')) {
+                console.error('Only JPEG files are allowed.');
+                setSnackbarMessage("Only JPEG files are allowed.");
+                setOpenSnackbar(true);
+                return;
+            }
+
+            //Compress image if oversize
             if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
                 try {
                     const options = {
@@ -96,6 +117,7 @@ export default function UpdatePage() {
         }
     };
 
+    // Handle scenery update
     const handleUpdate = async () => {
         try {
             if (!scenery) {
@@ -121,14 +143,14 @@ export default function UpdatePage() {
 
             formData.append('UserId', userId.toString());
             formData.append('SceneryId', scenery.sceneryId);
-
+            // Configure headers with authorization token
             const config = {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
                 }
             };
-
+            // Make API call to update scenery
             const response = await agent.updateScenery(formData, config);
 
             if (response.sceneryId) {
@@ -148,10 +170,21 @@ export default function UpdatePage() {
         }
     };
 
+    // Handle image deletion
+    const handleDeleteImage = () => {
+        setSelectedFile(null);
+        setImage(undefined);
+        // Reset file input field
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
     if (!scenery) {
         return <div>Loading...</div>
     }
 
+    // Handle unauthorized access if user is not the uploader of the scenery
     if (scenery.userId !== userId) {
         setSnackbarMessage("User can only update sceneries uploaded by the user");
         setOpenSnackbar(true);
@@ -160,16 +193,31 @@ export default function UpdatePage() {
 
     return (
         <Grid container justifyContent="center" spacing={2} sx={{ mt: 10 }}>
+            {/* Form submission handling */}
             <form onSubmit={(e) => e.preventDefault()}>
                 <Grid item xs={12}>
+                    {/* Displaying the selected image */}
                     <Grid item xs={12}>
-                        <img src={image} alt="scenery image" style={{ width: '40%' }} />
+                        {image && (
+                            <>
+                                <img src={image} alt="scenery image" style={{ width: '40%' }} />
+                                <IconButton onClick={handleDeleteImage} sx={{ position: 'relative', ml: '8px',  mb: '8px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </>
+                        )}
                     </Grid>
+                    {/* Input for selecting an image file */}
                     <Grid item xs={12} sx={{ mb: 5 }}>
-                        <input type="file" onChange={handleFileChange} />
+                        <input type="file" accept="image/jpeg" onChange={handleFileChange} />
+                        {/* Validation message if file is empty */}
+                        {selectedFile === null && (
+                            <Typography variant="body2" sx={{ color: 'blue', mt: 1 }}>Select a JPEG image for updating if necessary.</Typography>
+                        )}
                     </Grid>
 
                     <Grid container spacing={2}>
+                        {/* Text field for scenery name */}
                         <Grid item xs={6}>
                             <TextField
                                 variant='outlined'
@@ -182,10 +230,12 @@ export default function UpdatePage() {
                                 sx={{ mb: 5 }}
                                 id="sceneryNameInput"
                             />
+                            {/* Validation message if scenery name is empty */}
                             {!sceneryName && (
                                 <p style={{ color: 'red' }}>Scenery Name can't be empty.</p>
                             )}
                         </Grid>
+                        {/* Dropdown for selecting country */}
                         <Grid item xs={6}>
                             <TextField
                                 variant='outlined'
@@ -199,12 +249,14 @@ export default function UpdatePage() {
                                 sx={{ mb: 5 }}
                                 id="countryInput"
                             >
+                                {/* Mapping countries to options */}
                                 {countries.map((country) => (
                                     <MenuItem key={country} value={country}>
                                         {country}
                                     </MenuItem>
                                 ))}
                             </TextField>
+                            {/* Validation message if country is empty */}
                             {!country && (
                                 <p style={{ color: 'red' }}>Country can't be empty.</p>
                             )}
@@ -236,8 +288,10 @@ export default function UpdatePage() {
                         </Grid>
                     </Grid>
 
+                    {/* Buttons for saving and returning */}
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
+                            {/* Save button */}
                             <Button
                                 type="button"
                                 disabled={!sceneryName || !country}
@@ -258,6 +312,7 @@ export default function UpdatePage() {
                             </Button>
                         </Grid>
                         <Grid item xs={6}>
+                            {/* Return button */}
                             <Button
                                 onClick={() => navigate(`/about/${scenery.sceneryId}`)}
                                 sx={{
@@ -277,6 +332,7 @@ export default function UpdatePage() {
                         </Grid>
                     </Grid>
 
+                    {/* Snackbar for displaying success message */}
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>

@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_URL=http://backend:5500/api
+    ports:
+      - "3500:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "5500:80"
+    environment:
+      - ConnectionStrings__ApplicationDbContext=Server=tcp:msaprojectserver.database.windows.net,1433;Initial Catalog=MsaProject;Persist Security Info=False;User ID=zdybaijixiong;Password=ZDYzdy123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;
+    networks:
+      - app-network
+    
+networks:
+  app-network:
+    driver: bridge

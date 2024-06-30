@@ -42,6 +42,7 @@ namespace Backend.Tests
             var userId = 1;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user and scenery to in-memory database
             _dbContext.Users.Add(new User { Id = userId });
             _dbContext.Sceneries.Add(new Scenery
             {
@@ -82,6 +83,7 @@ namespace Backend.Tests
             var userId = 11;
             var sceneryId = Guid.NewGuid();
 
+            // Adding scenery without user to simulate user not found scenario
             _dbContext.Sceneries.Add(new Scenery
             {
                 SceneryId = sceneryId,
@@ -107,6 +109,7 @@ namespace Backend.Tests
             var userId = 111;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user without scenery to simulate scenery not found scenario
             _dbContext.Users.Add(new User { Id = userId });
             await _dbContext.SaveChangesAsync();
 
@@ -123,6 +126,7 @@ namespace Backend.Tests
             var userId = 1111;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user, scenery, and existing collection to simulate existing collection scenario
             _dbContext.Users.Add(new User { Id = userId });
             _dbContext.Sceneries.Add(new Scenery
             {
@@ -153,6 +157,7 @@ namespace Backend.Tests
             var userId = 2;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user, scenery, and collection to in-memory database
             _dbContext.Users.Add(new User { Id = userId });
             _dbContext.Sceneries.Add(new Scenery
             {
@@ -198,6 +203,7 @@ namespace Backend.Tests
             var userId = 22;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user without collection to simulate collection not found scenario
             _dbContext.Users.Add(new User { Id = userId });
             await _dbContext.SaveChangesAsync();
 
@@ -218,6 +224,7 @@ namespace Backend.Tests
             var sceneryId1 = Guid.NewGuid();
             var sceneryId2 = Guid.NewGuid();
 
+            // Adding user, sceneries, and collections to in-memory database
             _dbContext.Users.Add(new User { Id = userId });
             _dbContext.Sceneries.Add(new Scenery
             {
@@ -283,6 +290,7 @@ namespace Backend.Tests
             var userId = 4;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user, scenery, and collection to in-memory database
             _dbContext.Users.Add(new User { Id = userId });
             _dbContext.Sceneries.Add(new Scenery
             {
@@ -313,6 +321,7 @@ namespace Backend.Tests
             var userId = 44;
             var sceneryId = Guid.NewGuid();
 
+            // Adding user without collection to simulate collection not found scenario
             _dbContext.Users.Add(new User { Id = userId });
             await _dbContext.SaveChangesAsync();
 

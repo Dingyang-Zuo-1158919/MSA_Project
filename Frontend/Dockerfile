@@ -19,6 +19,6 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built React application
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 8080
+EXPOSE 80
 # Command to run NGINX
 CMD ["nginx", "-g", "daemon off;"]

@@ -2,10 +2,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 As base
 WORKDIR /app
 
-# Expose port 8081 for HTTP traffic
-EXPOSE 8081
-# Expose port 8082 for HTTPS traffic
-EXPOSE 8082
+# Expose port 80 for HTTP traffic
+EXPOSE 80
+# Expose port 443 for HTTPS traffic
+EXPOSE 443
 
 # Install curl (or wget)
 RUN apt-get update && apt-get install -y curl

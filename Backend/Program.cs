@@ -44,7 +44,7 @@ builder.Services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy",
             builder => builder
-                .WithOrigins("http://localhost:8080", "http://frontend:8080")
+                .WithOrigins("http://localhost:80", "http://localhost", "http://frontend", "http://scenerysharingfrontend.azurewebsites.net", "https://scenerysharingfrontend.azurewebsites.net")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
@@ -53,7 +53,7 @@ builder.Services.AddCors(options =>
 // Configures Https
 builder.Services.AddHttpsRedirection(options =>
 {
-    options.HttpsPort = 8082;
+    options.HttpsPort = 443;
 });
 
 // Configure Identity with custom password policies and JWT authentication.

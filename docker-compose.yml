@@ -2,29 +2,40 @@ version: '3.8'
 
 services:
   frontend:
+    container_name: frontend
+    image: frontend
     build:
       context: ./Frontend
       dockerfile: Dockerfile
-    environment:
-      - VITE_API_URL=http://backend:5500/api
     ports:
-      - "3500:80"
+      - "8080:8080"
+    environment:
+      - VITE_API_URL=https://backend:8082/api
     depends_on:
       - backend
     networks:
       - app-network
 
   backend:
+    container_name: backend
+    image: backend
     build:
       context: ./Backend
       dockerfile: Dockerfile
     ports:
-      - "5500:80"
+      - "8081:8081"
+      - "8082:8082"
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8081
+      - ASPNETCORE_HTTPS_PORTS=8082
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=343539544
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/Certificates.p12
       - ConnectionStrings__ApplicationDbContext=Server=tcp:msaprojectserver.database.windows.net,1433;Initial Catalog=MsaProject;Persist Security Info=False;User ID=zdybaijixiong;Password=ZDYzdy123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=60;
     networks:
       - app-network
-    
+
 networks:
   app-network:
     driver: bridge
+    name: msa_project-network

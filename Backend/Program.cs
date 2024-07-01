@@ -44,11 +44,17 @@ builder.Services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy",
             builder => builder
-                .WithOrigins("http://localhost:3024", "http://localhost:3500")
+                .WithOrigins("http://localhost:8080", "http://frontend:8080")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
     });
+
+// Configures Https
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.HttpsPort = 8082;
+});
 
 // Configure Identity with custom password policies and JWT authentication.
 builder.Services.AddIdentity<User, IdentityRole<int>>(opt =>

@@ -162,7 +162,7 @@ const agent = {
   },
 
   // Function to fetch a collection by its ID
-  getCollectionById: async (userId:number, Id: string, config: AxiosRequestConfig) => {
+  getCollectionById: async (userId: number, Id: string, config: AxiosRequestConfig) => {
     try {
       const response = await axios.get(`${API_URL}/Collections/GetCollectionById`, {
         ...config,
@@ -172,10 +172,10 @@ const agent = {
         // Send credentials with request
         withCredentials: true,
         // Parameters for the request
-        params: {userId: userId, sceneryId: Id}
+        params: { userId: userId, sceneryId: Id }
       });
       return response.data;
-    }catch (error) {
+    } catch (error) {
       throw error;
     }
   }

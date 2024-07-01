@@ -1,24 +1,36 @@
-# Stage 1: Build .NET Application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Stage 1: Serve .NET Application
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 As base
 WORKDIR /app
+
+# Expose port 8081 for HTTP traffic
+EXPOSE 8081
+# Expose port 8082 for HTTPS traffic
+EXPOSE 8082
+
+# Install curl (or wget)
+RUN apt-get update && apt-get install -y curl
+
+# Copy Certificates.p12 from local machine to container
+COPY Certificates.p12 /app/Certificates.p12
+
+# Stage 2: Build .NET Application
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
 # Copy csproj files and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
+COPY Backend.csproj .
+RUN dotnet restore Backend.csproj
 
 # Copy entire project and publish
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY . .
+WORKDIR /src
+RUN dotnet build Backend.csproj -c Release -o /app/build
 
-# Stage 2: Serve .NET Application
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+FROM build AS publish
+RUN dotnet publish Backend.csproj -c Release -o /app/publish
+
+FROM base AS final
 WORKDIR /app
-
-# Copy published output from build stage
-COPY --from=build /app/out .
-
-# Expose port 80 for HTTP traffic
-EXPOSE 80
-
-# Command to run the application
-CMD ["dotnet", "Backend.dll"]
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Backend.dll"]

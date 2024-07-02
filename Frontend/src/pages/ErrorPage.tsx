@@ -7,7 +7,7 @@ export default function ErrorPage() {
     const navigate = useNavigate();
     // Handler for the "Go Back" button click event
     const handleGoBack = () => {
-        navigate('/homepage')
+        navigate('/')
     };
 
     return (
@@ -25,7 +25,7 @@ export default function ErrorPage() {
                     404
                 </Typography>
                 {/* Display the error message */}
-                <Typography variant="h4" color="textSecondary" sx={{mb:10}}>
+                <Typography variant="h4" color="textSecondary" sx={{ mb: 10 }}>
                     Oops! Page not found.
                 </Typography>
                 {/* Button to navigate back to the homepage */}

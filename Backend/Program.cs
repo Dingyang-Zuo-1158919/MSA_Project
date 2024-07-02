@@ -44,7 +44,7 @@ builder.Services.AddCors(options =>
     {
         options.AddPolicy("CorsPolicy",
             builder => builder
-                .WithOrigins("http://localhost:80", "http://localhost", "http://frontend", "http://scenerysharingfrontend.azurewebsites.net", "https://scenerysharingfrontend.azurewebsites.net")
+                .WithOrigins("http://localhost:80", "http://localhost", "http://frontend", "http://localhost:8080", "http://scenerysharingfrontend.azurewebsites.net", "https://scenerysharingfrontend.azurewebsites.net")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
@@ -117,10 +117,15 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure middleware for HTTPS redirection, routing, CORS, authentication, and authorization.
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors("CorsPolicy");
+// app.UseCors("CorsPolicy");
+app.UseCors(x => x
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .SetIsOriginAllowed(origin => true) 
+        .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();

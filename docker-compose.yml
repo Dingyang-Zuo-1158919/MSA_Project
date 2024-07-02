@@ -10,7 +10,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - VITE_API_URL=https://backend:443/api
+      - VITE_API_URL=https://scenerysharingbackend.azurewebsites.net/api
     depends_on:
       - backend
     networks:

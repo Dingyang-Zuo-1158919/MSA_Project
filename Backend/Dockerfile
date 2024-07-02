@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y curl
 COPY Certificates.p12 /app/Certificates.p12
 
 # Stage 2: Build .NET Application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+ENV DOTNET_EnableWriteXorExecute=0
 WORKDIR /src
 
 # Copy csproj files and restore dependencies
@@ -24,13 +25,15 @@ RUN dotnet restore Backend.csproj
 # Copy entire project and publish
 COPY . .
 WORKDIR /src
-RUN dotnet build Backend.csproj -c Release -o /app/build
+# RUN dotnet build Backend.csproj -c Release -o /app/build
 
 
-FROM build AS publish
+# FROM build-env AS publish
 RUN dotnet publish Backend.csproj -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+# COPY --from=publish /app/publish .
+COPY --from=build-env /app/publish .
+# ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 ENTRYPOINT ["dotnet", "Backend.dll"]

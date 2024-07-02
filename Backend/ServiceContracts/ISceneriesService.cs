@@ -7,7 +7,7 @@ namespace Backend.ServiceContracts
     public interface ISceneriesService
     {
         // Adds a new scenery based on the provided request
-        Task<SceneryResponse> AddScenery(SceneryAddRequest? sceneryAddRequest);
+        Task<SceneryResponse> AddScenery(SceneryAddRequest sceneryAddRequest);
 
         // Updates an existing scenery based on the provided update request
         Task<SceneryResponse> UpdateScenery(SceneryUpdateRequest? sceneryUpdateRequest);

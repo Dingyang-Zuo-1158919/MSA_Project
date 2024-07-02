@@ -152,6 +152,9 @@ export default function UploadPage() {
                 setComment('');
                 setCountryTouched(false);
                 setSceneryNameTouched(false);
+                setTimeout(() => {
+                    navigate(`/about/${response.sceneryId}`);
+                }, 1000);
             } else {
                 console.error('upload failed.');
                 setErrorSnackbarMessage("Upload failed.");
@@ -205,7 +208,7 @@ export default function UploadPage() {
                     <Grid container spacing={2}>
                         {/* Input for selecting an image file */}
                         <Grid item xs={12}>
-                            <input ref={fileInputRef} type="file" accept="image/jpeg" onChange={handleFileChange} />
+                            <input ref={fileInputRef} type="file" required accept="image/jpeg" onChange={handleFileChange} />
                             {/* Validation message if file is empty */}
                             {selectedFile === null && (
                                 <Typography variant="body2" sx={{ color: 'blue', mt: 1 }}>Please select a JPEG image for uploading.</Typography>
@@ -291,7 +294,7 @@ export default function UploadPage() {
                                     {/* Upload button */}
                                     <Button
                                         type="submit"
-                                        disabled={!sceneryName || !selectedCountry}
+                                        disabled={!sceneryName || !selectedCountry || !selectedFile}
                                         sx={{
                                             color: 'white',
                                             fontWeight: 'bold',

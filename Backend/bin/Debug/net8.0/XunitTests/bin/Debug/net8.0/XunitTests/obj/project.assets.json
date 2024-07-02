@@ -10436,6 +10436,7 @@
       "Backend >= 1.0.0",
       "Microsoft.EntityFrameworkCore >= 8.0.6",
       "Microsoft.EntityFrameworkCore.InMemory >= 8.0.6",
+      "Microsoft.Extensions.Logging.Abstractions >= 8.0.1",
       "Microsoft.NET.Test.Sdk >= 17.8.0",
       "coverlet.collector >= 6.0.0",
       "xunit >= 2.8.1",
@@ -10495,6 +10496,10 @@
           "Microsoft.EntityFrameworkCore.InMemory": {
             "target": "Package",
             "version": "[8.0.6, )"
+          },
+          "Microsoft.Extensions.Logging.Abstractions": {
+            "target": "Package",
+            "version": "[8.0.1, )"
           },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",

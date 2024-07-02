@@ -18,7 +18,7 @@ namespace Backend.ServiceContracts.DTO
         public string? Comment { get; set; }
         [Required]
         public int UserId { get; set; }
-        public IFormFile ImageData { get; set; } // Represents the image data of the scenery
+        public IFormFile ImageData { get; set; } = default!; // Represents the image data of the scenery
 
         // Converts the DTO object to a Scenery entity object
         public Scenery ToScenery()

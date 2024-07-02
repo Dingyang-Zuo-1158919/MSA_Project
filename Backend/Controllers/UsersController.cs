@@ -53,7 +53,7 @@ namespace Backend.Controllers
                     }
                     else
                     {
-                        return BadRequest(result.Errors);
+                        return BadRequest("Strong Password needed");
                     }
                 }
                 else
@@ -63,7 +63,7 @@ namespace Backend.Controllers
             }
             else
             {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid Register information");
             }
         }
 

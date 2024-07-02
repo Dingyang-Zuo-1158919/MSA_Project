@@ -12,6 +12,8 @@ using Backend.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Moq;
 
@@ -34,7 +36,17 @@ namespace Backend.Tests
         private Mock<UserManager<User>> GetUserManagerMock()
         {
             var store = new Mock<IUserStore<User>>();
-            return new Mock<UserManager<User>>(store.Object,null, null, null, null, null, null, null, null);
+            var userManager = new Mock<UserManager<User>>(store.Object, 
+            new Mock<IOptions<IdentityOptions>>().Object, 
+            new Mock<IPasswordHasher<User>>().Object, 
+            new IUserValidator<User>[0], 
+            new IPasswordValidator<User>[0], 
+            new Mock<ILookupNormalizer>().Object, 
+            new Mock<IdentityErrorDescriber>().Object, 
+            new Mock<IServiceProvider>().Object, 
+            new Mock<ILogger<UserManager<User>>>().Object);
+            return userManager;
+            // return new Mock<UserManager<User>>(store.Object,null, null, null, null, null, null, null, null);
         }
 
         #region GenerateTokenAsync_ValidUser
@@ -61,7 +73,7 @@ namespace Backend.Tests
         public async Task GenerateTokenAsync_NullUser()
         {
             //Arrange
-            User user = null;
+            User? user = null;
             var configuration = GetConfigurationMock().Object;
             var userManagerMock = GetUserManagerMock();
             var service = new LoginTokenService(configuration, userManagerMock.Object);
@@ -69,7 +81,7 @@ namespace Backend.Tests
             //Act and Assert
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await service.GenerateTokenAsync(user);
+                await service.GenerateTokenAsync(user!);
             });
         }
         #endregion

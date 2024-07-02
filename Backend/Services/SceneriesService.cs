@@ -61,7 +61,7 @@ namespace Backend.Services
             ArgumentNullException.ThrowIfNull(sceneryUpdateRequest);
             ValidationHelper.ModelValidation(sceneryUpdateRequest);
 
-            byte[] imageData = null;
+            byte[]? imageData = null;
 
             // Convert received image from IFormFile to byte[] if provided
             if (sceneryUpdateRequest.ImageData != null)
@@ -74,7 +74,7 @@ namespace Backend.Services
             }
 
             // Retrieve existing scenery from repository
-            Scenery matchingScenery = await _sceneriesRepository.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
+            Scenery? matchingScenery = await _sceneriesRepository.GetSceneryBySceneryId(sceneryUpdateRequest.SceneryId);
             ArgumentNullException.ThrowIfNull(matchingScenery);
 
             // Update scenery properties

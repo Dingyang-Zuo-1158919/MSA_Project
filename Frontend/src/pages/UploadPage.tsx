@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, MenuItem, TextField, Typography, useTheme } from "@mui/material";
+import { Button, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useEffect, useRef, useState } from "react";
 import Snackbar from '@mui/material/Snackbar';
@@ -10,7 +10,9 @@ import agent from "../api/agent";
 import compressImage from 'browser-image-compression';
 
 export default function UploadPage() {
+    // Responsive styling
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // Navigation hook
     const navigate = useNavigate();
     // Get user information from Redux store
@@ -190,32 +192,33 @@ export default function UploadPage() {
     }
 
     return (
-        <Grid container spacing={6} sx={{ mt: 10, ml: 20 }}>
+        <Grid container justifyContent="center" spacing={2} sx={{ mt: 10 }}>
             {/* Form submission handling */}
-            <form onSubmit={handleSubmit}>
-                {/* Displaying the selected image */}
-                <Grid item xs={6}>
-                    {image && (
-                        <>
-                            <img src={image} alt="scenery image" style={{ width: '100%', maxWidth: '100%' }} />
-                            <IconButton onClick={handleDeleteImage} sx={{ position: 'relative', mb: '8px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </>
-                    )}
-                </Grid>
-                <Grid item xs={6}>
-                    <Grid container spacing={2}>
-                        {/* Input for selecting an image file */}
-                        <Grid item xs={12}>
-                            <input ref={fileInputRef} type="file" required accept="image/jpeg" onChange={handleFileChange} />
-                            {/* Validation message if file is empty */}
-                            {selectedFile === null && (
-                                <Typography variant="body2" sx={{ color: 'blue', mt: 1 }}>Please select a JPEG image for uploading.</Typography>
-                            )}
-                        </Grid>
-                        <Grid item xs={12}>
-                            {/* Text field for scenery name */}
+            <Grid item xs={12}>
+                <form onSubmit={handleSubmit}>
+                    {/* Displaying the selected image */}
+                    <Grid item xs={12}>
+                        {image && (
+                            <>
+                                <img src={image} alt="scenery image" style={{ width: '50%', maxWidth: '100%' }} />
+                                <IconButton onClick={handleDeleteImage} sx={{ position: 'relative', mb: '8px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </>
+                        )}
+                    </Grid>
+                    {/* Input for selecting an image file */}
+                    <Grid item xs={12} sx={{ mb: 5 }}>
+                        <input ref={fileInputRef} type="file" required accept="image/jpeg" onChange={handleFileChange} />
+                        {/* Validation message if file is empty */}
+                        {selectedFile === null && (
+                            <Typography variant="body2" sx={{ color: 'blue', mt: 1 }}>Please select a JPEG image for uploading.</Typography>
+                        )}
+                    </Grid>
+
+                    <Grid container spacing={2} direction={isMobile ? 'column' : 'row'}>
+                        {/* Text field for scenery name */}
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 required
@@ -227,7 +230,7 @@ export default function UploadPage() {
                                     setSceneryNameTouched(true);
                                 }}
                                 fullWidth
-                                sx={{ mb: 2 }}
+                                sx={{ mb: 5 }}
                                 id="sceneryNameInput"
                             />
                             {/* Validation message if scenery name is empty after handling */}
@@ -236,7 +239,7 @@ export default function UploadPage() {
                             )}
                         </Grid>
                         {/* Dropdown for selecting country */}
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 select
@@ -248,7 +251,7 @@ export default function UploadPage() {
                                     setCountryTouched(true);
                                 }}
                                 fullWidth
-                                sx={{ mb: 2 }}
+                                sx={{ mb: 5 }}
                                 id="countryInput"
                             >
                                 {/* Mapping countries to options */}
@@ -263,7 +266,8 @@ export default function UploadPage() {
                                 <Typography variant="body2" sx={{ color: 'red' }}>Country can't be empty.</Typography>
                             )}
                         </Grid>
-                        <Grid item xs={12}>
+
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 type='string'
@@ -271,11 +275,11 @@ export default function UploadPage() {
                                 value={city}
                                 onChange={(e) => setCity(e.target.value)}
                                 fullWidth
-                                sx={{ mb: 2 }}
+                                sx={{ mb: 5 }}
                                 id="cityInput"
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 type='string'
@@ -283,58 +287,60 @@ export default function UploadPage() {
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                                 fullWidth
-                                sx={{ mb: 2 }}
+                                sx={{ mb: 5 }}
                                 id="commentInput"
                             />
                         </Grid>
-                        {/* Buttons for uploading and returning */}
-                        <Grid item xs={12}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={6}>
-                                    {/* Upload button */}
-                                    <Button
-                                        type="submit"
-                                        disabled={!sceneryName || !selectedCountry || !selectedFile}
-                                        sx={{
-                                            color: 'white',
-                                            fontWeight: 'bold',
-                                            fontSize: '15px',
-                                            backgroundColor: '#ffc107',
-                                            border: '2px solid #ffc107',
-                                            '&:hover': {
-                                                backgroundColor: "#ff9800",
-                                                color: theme.palette.success.contrastText,
-                                                border: "2px solid #ff9800",
-                                            }
-                                        }}>
-                                        Upload
-                                    </Button>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    {/* Return button */}
-                                    <Button
-                                        onClick={() => navigate('/')}
-                                        sx={{
-                                            color: 'white',
-                                            fontWeight: 'bold',
-                                            fontSize: '15px',
-                                            backgroundColor: '#33ab9f',
-                                            border: '2px solid #33ab9f',
-                                            '&:hover': {
-                                                backgroundColor: "#00695f",
-                                                color: theme.palette.success.contrastText,
-                                                border: "2px solid #00695f",
-                                            }
-                                        }}>
-                                        Return
-                                    </Button>
-                                </Grid>
-                            </Grid>
+                    </Grid>
+                    {/* Buttons for uploading and returning */}
+                    <Grid container spacing={2} direction={isMobile ? 'column' : 'row'}>
+                        <Grid item xs={12} sm={6}>
+                            {/* Upload button */}
+                            <Button
+                                type="submit"
+                                disabled={!sceneryName || !selectedCountry || !selectedFile}
+                                sx={{
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    fontSize: '15px',
+                                    backgroundColor: '#ffc107',
+                                    border: '2px solid #ffc107',
+                                    '&:hover': {
+                                        backgroundColor: "#ff9800",
+                                        color: theme.palette.success.contrastText,
+                                        border: "2px solid #ff9800",
+                                    },
+                                    width: isMobile ? '100%' : 'auto',
+                                }}>
+                                Upload
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            {/* Return button */}
+                            <Button
+                                onClick={() => navigate('/')}
+                                sx={{
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    fontSize: '15px',
+                                    backgroundColor: '#33ab9f',
+                                    border: '2px solid #33ab9f',
+                                    '&:hover': {
+                                        backgroundColor: "#00695f",
+                                        color: theme.palette.success.contrastText,
+                                        border: "2px solid #00695f",
+                                    },
+                                    width: isMobile ? '100%' : 'auto',
+                                }}>
+                                Return
+                            </Button>
                         </Grid>
                     </Grid>
 
+
+
+                    {/* Snackbar for displaying success message */}
                     <Grid container spacing={2}>
-                        {/* Snackbar for displaying success message */}
                         <Grid item xs={12}>
                             <Snackbar open={openSuccessSnackbar} autoHideDuration={6000} onClose={handleCloseSuccessSnackbar}>
                                 <MuiAlert onClose={handleCloseSuccessSnackbar} severity="success" sx={{ width: '100%', backgroundColor: theme.palette.success.main, color: 'white', fontWeight: 'bold' }}>
@@ -351,8 +357,8 @@ export default function UploadPage() {
                             </Snackbar>
                         </Grid>
                     </Grid>
-                </Grid>
-            </form>
-        </Grid>
+                </form>
+            </Grid >
+        </Grid >
     );
 }

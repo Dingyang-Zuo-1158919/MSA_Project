@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, CircularProgress, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Scenery } from "../models/Scenery";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -9,6 +9,10 @@ interface Props {
 }
 
 export default function SingleScenery({ scenery }: Props) {
+    // Responsive styling
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isPad = useMediaQuery(theme.breakpoints.down('md'));
     // State to manage image loading state
     const [imageLoading, setImageLoading] = useState(true);
     // Convert scenery byte data from backend to image URL
@@ -23,6 +27,7 @@ export default function SingleScenery({ scenery }: Props) {
                 titleTypographyProps={{
                     sx: { fontWeight: 'bold', color: 'primary.main' }
                 }}
+                sx={isMobile ? { marginBottom: '-250px' } : isPad ? {marginBottom: '-80px'} : {marginBottom: '-110px'}}
             />
             {/* Scenery media section with loading indicator */}
             <CardMedia style={{ position: 'relative', paddingTop: '56.25%' }}>
@@ -31,7 +36,7 @@ export default function SingleScenery({ scenery }: Props) {
                     src={imageUrl}
                     alt={scenery.sceneryName}
                     onLoad={() => setImageLoading(false)}
-                    style={{ display: imageLoading ? 'none' : 'block', width: '100%', height: '10vh', objectFit: 'cover' }}
+                    style={{ display: imageLoading ? 'none' : 'block', width: '100%', height: '100%', objectFit: 'cover' }}
                 />
             </CardMedia>
             {/* Scenery content with scenery name and city */}

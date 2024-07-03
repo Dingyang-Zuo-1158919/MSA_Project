@@ -3,10 +3,13 @@ import { RootState } from "../Redux/store";
 import { useEffect, useState } from "react";
 import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
-import { Box, Button, CircularProgress, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Pagination, Switch, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import SingleScenery from "./SingleScenery";
 
 export default function MyCollectionPage() {
+    // Responsive styling
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // Fetch userId and token from Redux store
     const userId = useSelector((state: RootState) => state.auth.userId);
     const token = useSelector((state: RootState) => state.auth.token);
@@ -115,21 +118,23 @@ export default function MyCollectionPage() {
     };
 
     return (
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh' }}>
             {/* Sidebar for searching and sorting options */}
             <Box
                 sx={{
-                    width: '20%',
+                    width: isMobile ? '100%' : 'auto',
+                    maxWidth: isMobile ? '100%' : '300px',
                     padding: '10px',
                     backgroundColor: '#eeeee',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'left',
                     justifyContent: 'flex-start',
+                    flexShrink: 0,
                 }}
             >
                 {/* Search functionality */}
-                <Typography variant='body1' sx={{ marginRight: 1, mb: 2 }}>
+                <Typography variant='body1' sx={{ marginRight: 1, mb: 2, flexShrink: 0 }}>
                     Search&nbsp;Scenery&nbsp;Name:
                 </Typography>
                 <TextField
@@ -137,37 +142,38 @@ export default function MyCollectionPage() {
                     variant="outlined"
                     value={searchQuery}
                     onChange={handleSearchInputChange}
-                    sx={{ marginBottom: 1 }}
+                    sx={{ marginBottom: 1, flexShrink: 0, width: isMobile ? '100%' : 'auto' }}
+                    fullWidth={!isMobile}
                 />
                 <br />
                 {/* Sort functionality */}
-                <Typography variant='body1' sx={{ marginRight: 1, mb: 2 }}>
+                <Typography variant='body1' sx={{ marginRight: 1, mb: 2, flexShrink: 0 }}>
                     Sort&nbsp;By:
                 </Typography>
                 <Button
                     variant={selectedSortOption === "sceneryName" ? "contained" : "outlined"}
                     onClick={() => handleSort("sceneryName")}
-                    sx={{ marginBottom: 1 }}
+                    sx={{ marginBottom: 1, width: isMobile ? '100%' : 'auto' }}
                 >
                     Name
                 </Button>
                 <Button
                     variant={selectedSortOption === "country" ? "contained" : "outlined"}
                     onClick={() => handleSort("country")}
-                    sx={{ marginBottom: 1 }}
+                    sx={{ marginBottom: 1, width: isMobile ? '100%' : 'auto' }}
                 >
                     Country
                 </Button>
                 <Button
                     variant={selectedSortOption === "city" ? "contained" : "outlined"}
                     onClick={() => handleSort("city")}
-                    sx={{ marginBottom: 1 }}
+                    sx={{ marginBottom: 1, width: isMobile ? '100%' : 'auto' }}
                 >
                     City
                 </Button>
                 <br />
                 {/* Switch for sorting order */}
-                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2, flexShrink: 0 }}>
                     <Typography variant='body1' sx={{ marginRight: 1 }}>
                         Sort&nbsp;Order: {sortOrder === "asc" ? "Ascending" : "Descending"}
                     </Typography>
@@ -209,7 +215,7 @@ export default function MyCollectionPage() {
                 {/* Display sorted/searched collection items */}
                 <Grid container spacing={2}>
                     {currentItems.map(c => (
-                        <Grid item xs={4} key={c.sceneryId}>
+                        <Grid item xs={12} sm={6} md={4} key={c.sceneryId}>
                             <SingleScenery scenery={c} />
                         </Grid>
                     ))}

@@ -6,13 +6,15 @@ import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { Button, Grid, IconButton, MenuItem, TextField, Typography, useTheme } from "@mui/material";
+import { Button, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import compressImage from 'browser-image-compression';
 import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
 
 export default function UpdatePage() {
+    // Responsive styling
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // Get the scenery ID from the URL parameters
     const { Id } = useParams<{ Id: string }>();
     // Navigation hook
@@ -216,9 +218,9 @@ export default function UpdatePage() {
                         )}
                     </Grid>
 
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} direction={isMobile ? 'column' : 'row'}>
                         {/* Text field for scenery name */}
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 type='string'
@@ -236,7 +238,7 @@ export default function UpdatePage() {
                             )}
                         </Grid>
                         {/* Dropdown for selecting country */}
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 type='string'
@@ -262,7 +264,7 @@ export default function UpdatePage() {
                             )}
                         </Grid>
 
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 type='string'
@@ -274,7 +276,7 @@ export default function UpdatePage() {
                                 id="cityInput"
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 variant='outlined'
                                 type='string'
@@ -289,8 +291,8 @@ export default function UpdatePage() {
                     </Grid>
 
                     {/* Buttons for saving and returning */}
-                    <Grid container spacing={2}>
-                        <Grid item xs={6}>
+                    <Grid container spacing={2} direction={isMobile ? 'column' : 'row'}>
+                        <Grid item xs={12} sm={6}>
                             {/* Save button */}
                             <Button
                                 type="button"
@@ -306,12 +308,13 @@ export default function UpdatePage() {
                                         backgroundColor: "#ff9800",
                                         color: theme.palette.success.contrastText,
                                         border: "2px solid #ff9800",
-                                    }
+                                    },
+                                    width: isMobile ? '100%' : 'auto',
                                 }}>
                                 Save
                             </Button>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             {/* Return button */}
                             <Button
                                 onClick={() => navigate(`/about/${scenery.sceneryId}`)}
@@ -325,7 +328,8 @@ export default function UpdatePage() {
                                         backgroundColor: "#00695f",
                                         color: theme.palette.success.contrastText,
                                         border: "2px solid #00695f",
-                                    }
+                                    },
+                                    width: isMobile ? '100%' : 'auto',
                                 }}>
                                 Return
                             </Button>

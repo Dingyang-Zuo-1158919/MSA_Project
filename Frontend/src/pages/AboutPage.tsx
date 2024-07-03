@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Divider, Grid, Link, Typography, useTheme } from "@mui/material";
+import { Button, CircularProgress, Divider, Grid, Link, Typography, useMediaQuery, useTheme } from "@mui/material";
 import agent from "../api/agent";
 import { useEffect, useState } from "react";
 import { Scenery } from "../models/Scenery";
@@ -10,6 +10,9 @@ import { RootState } from "../Redux/store";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 export default function AboutPage() {
+    // Responsive styling
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     // State to manage the Snackbar visibility and message
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -17,8 +20,6 @@ export default function AboutPage() {
     const { Id } = useParams<{ Id: string }>();
     // State to store the scenery details
     const [scenery, setScenery] = useState<Scenery | null>(null);
-    // Theme for styling
-    const theme = useTheme();
     // Navigation hook
     const navigate = useNavigate();
     // Get user information from Redux store
@@ -196,11 +197,11 @@ export default function AboutPage() {
     const imageUrl = URL.createObjectURL(blob);
 
     return (
-        <Grid container spacing={6} sx={{ mt: 15 }}>
-            <Grid item xs={6}>
+        <Grid container spacing={isMobile ? 2 : 6} sx={{ mt: 15 }}>
+            <Grid item xs={12} md={6}>
                 <img src={imageUrl} alt={scenery.sceneryName} style={{ width: '100%' }} />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
                 <Typography variant='h3' sx={{ mb: 2 }} >{scenery.sceneryName}</Typography>
                 <Typography variant='h4' color='success.main'>{scenery.country} - {scenery.city}</Typography>
 
@@ -227,22 +228,64 @@ export default function AboutPage() {
                         log in to enable below operations
                     </Typography>
                 )}
+                {!isLoggedIn || userId !== scenery.userId && (
+                    <Typography variant="body1" color="#009688" paragraph>
+                        only uploader can update or delete the scenery
+                    </Typography>
+                )}
                 <br />
-                <Grid container spacing={2}>
-                    <Grid item xs={6}>
+                <Grid container spacing={2} direction={isMobile ? 'column' : 'row'}>
+                    <Grid item xs={12} sm={6}>
                         {/* Collect/Collected button */}
                         <Button component={Link} disabled={!isLoggedIn} data-testid="collect-button"
                             onClick={handleCollect} sx={{
-                            color: 'white', backgroundColor: '#a2cf6e', fontWeight: 'bold', fontSize: '15px',
-                            border: "2px solid #a2cf6e",
-                            '&:hover': {
-                                backgroundColor: "#4caf50",
-                                color: theme.palette.success.contrastText,
-                                border: "2px solid #4caf50",
-                            }
-                        }}>{isCollected ? 'Collected' : 'Collect'}</Button>
+                                color: 'white', backgroundColor: '#a2cf6e', fontWeight: 'bold', fontSize: '15px',
+                                border: "2px solid #a2cf6e",
+                                '&:hover': {
+                                    backgroundColor: "#4caf50",
+                                    color: theme.palette.success.contrastText,
+                                    border: "2px solid #4caf50",
+                                },
+                                width: isMobile ? '100%' : 'auto',
+                            }}>{isCollected ? 'Collected' : 'Collect'}</Button>
                     </Grid>
-                    <Grid item xs={6}>
+
+                    <Grid item xs={12} sm={6}>
+                        {/* Update button */}
+                        <Button component={Link} disabled={!isLoggedIn || userId !== scenery.userId}
+                            data-testid="update-button" onClick={() => navigate(`/update/${Id}`)} sx={{
+                                color: "white", backgroundColor: "#ffc107", fontWeight: 'bold', fontSize: '15px',
+                                border: "2px solid #ffc107",
+                                '&:hover': {
+                                    backgroundColor: "#ff9800",
+                                    color: theme.palette.success.contrastText,
+                                    border: "2px solid #ff9800",
+                                },
+                                width: isMobile ? '100%' : 'auto',
+                            }}>Update</Button>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                        {/* Delete button */}
+                        <Button onClick={handleOpenModal} disabled={!isLoggedIn || userId !== scenery.userId} sx={{
+                            color: theme.palette.error.contrastText, backgroundColor: "#f6685e", fontWeight: 'bold', fontSize: '15px',
+                            border: "2px solid #f6685e",
+                            '&:hover': {
+                                backgroundColor: theme.palette.error.main,
+                                color: theme.palette.error.contrastText,
+                                border: `2px solid ${theme.palette.error.main}`,
+                            },
+                            width: isMobile ? '100%' : 'auto',
+                        }}>Delete</Button>
+                        {/* Delete confirmation modal */}
+                        <DeleteConfirmationModal
+                            open={openModal}
+                            onClose={handleCloseModal}
+                            onConfirmDelete={handleDelete}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
                         {/* Return button */}
                         <Button
                             onClick={() => navigate("/sceneries")}
@@ -256,53 +299,11 @@ export default function AboutPage() {
                                     backgroundColor: "#00695f",
                                     color: theme.palette.success.contrastText,
                                     border: "2px solid #00695f",
-                                }
+                                },
+                                width: isMobile ? '100%' : 'auto',
                             }}>
-                            Return
-                        </Button>
+                            Return</Button>
                     </Grid>
-                </Grid>
-                <br />
-                {!isLoggedIn || userId !== scenery.userId && (
-                    <Typography variant="body1" color="#009688" paragraph>
-                        only uploader can update or delete the scenery
-                    </Typography>
-                )}
-                <br />
-                <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                        {/* Update button */}
-                        <Button component={Link} disabled={!isLoggedIn || userId !== scenery.userId}
-                            data-testid="update-button" onClick={() => navigate(`/update/${Id}`)} sx={{
-                            color: "white", backgroundColor: "#ffc107", fontWeight: 'bold', fontSize: '15px',
-                            border: "2px solid #ffc107",
-                            '&:hover': {
-                                backgroundColor: "#ff9800",
-                                color: theme.palette.success.contrastText,
-                                border: "2px solid #ff9800",
-                            }
-                        }}>Update</Button>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        {/* Delete button */}
-                        <Button onClick={handleOpenModal} disabled={!isLoggedIn || userId !== scenery.userId} sx={{
-                            color: theme.palette.error.contrastText, backgroundColor: "#f6685e", fontWeight: 'bold', fontSize: '15px',
-                            border: "2px solid #f6685e",
-                            '&:hover': {
-                                backgroundColor: theme.palette.error.main,
-                                color: theme.palette.error.contrastText,
-                                border: `2px solid ${theme.palette.error.main}`,
-                            }
-                        }}>Delete</Button>
-                        {/* Delete confirmation modal */}
-                        <DeleteConfirmationModal
-                            open={openModal}
-                            onClose={handleCloseModal}
-                            onConfirmDelete={handleDelete}
-                        />
-                    </Grid>
-                    <Divider sx={{ mt: 5 }} />
                 </Grid>
             </Grid>
         </Grid>

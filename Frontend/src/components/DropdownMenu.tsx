@@ -5,7 +5,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 
-export default function DropdownMenu() {
+interface DropdownMenuProps {
+    onItemClick: (label: string) => void;
+}
+
+export default function DropdownMenu({ onItemClick }: DropdownMenuProps) {
     // State for managing menu open/close
     const [open, setOpen] = React.useState(false);
     // Reference for the anchor element (Button)
@@ -41,6 +45,7 @@ export default function DropdownMenu() {
         setSelectedIndex(index);
         setOpen(false);
         setSelectedLabel(options[index].label);
+        onItemClick(options[index].label);
         if (options[index].path) {
             navigate(options[index].path);
         }
@@ -59,7 +64,6 @@ export default function DropdownMenu() {
         ) {
             return;
         }
-
         setOpen(false);
     };
 

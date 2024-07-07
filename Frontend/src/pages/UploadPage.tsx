@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Button, CircularProgress, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useEffect, useRef, useState } from "react";
 import Snackbar from '@mui/material/Snackbar';
@@ -31,6 +31,7 @@ export default function UploadPage() {
     const [sceneryName, setSceneryName] = useState<string>('');
     const [city, setCity] = useState<string>('');
     const [comment, setComment] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false);
     // State to track if fields have been touched for validation
     const [sceneryNameTouched, setSceneryNameTouched] = useState(false);
     const [countryTouched, setCountryTouched] = useState(false);
@@ -109,6 +110,9 @@ export default function UploadPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        // Set loading state to true to show CircularProgress
+        setIsLoading(true);
+
         if (!selectedFile) {
             console.error('No file selected.');
             setErrorSnackbarMessage("No scenery image uploaded.");
@@ -173,6 +177,8 @@ export default function UploadPage() {
             } else {
                 console.log('Error details:', error.message);
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -357,6 +363,12 @@ export default function UploadPage() {
                             </Snackbar>
                         </Grid>
                     </Grid>
+                    {/* Circular Progress for loading indicator */}
+                    {isLoading && (
+                        <Grid item xs={12}>
+                            <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                        </Grid>
+                    )}
                 </form>
             </Grid >
         </Grid >

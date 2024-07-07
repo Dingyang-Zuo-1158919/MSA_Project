@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Container, Grid, Paper, SnackbarContent, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, CircularProgress, Container, Grid, Paper, SnackbarContent, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -23,11 +23,15 @@ export default function RegisterPage() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isUsernameTouched, setIsUsernameTouched] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // Prevent default form submission
     e.preventDefault();
+
+    // Set loading state to true to show CircularProgress
+    setLoading(true);
 
     try {
       // Send register request to the API
@@ -50,6 +54,8 @@ export default function RegisterPage() {
       }
 
       setRegistrationError(errors);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,6 +117,9 @@ export default function RegisterPage() {
 
   return (
     <Container component={Paper} maxWidth="sm" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4 }}>
+      {/* Display CircularProgress if loading */}
+      {loading && <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />}
+
       {/* Avatar icon */}
       <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}></Avatar>
       {/* Register title */}

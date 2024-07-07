@@ -6,7 +6,7 @@ import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { Button, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Button, CircularProgress, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import compressImage from 'browser-image-compression';
 import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
@@ -33,6 +33,7 @@ export default function UpdatePage() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [countries, setCountries] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     // Maximum image file size allowed in MB
     const MAX_FILE_SIZE_MB = 1;
     // Ref for file input
@@ -122,6 +123,8 @@ export default function UpdatePage() {
     // Handle scenery update
     const handleUpdate = async () => {
         try {
+            setIsLoading(true);
+
             if (!scenery) {
                 console.error("scenery data is missing");
                 return;
@@ -169,6 +172,8 @@ export default function UpdatePage() {
             console.error("Error updating scenery:", error);
             setSnackbarMessage("Error updating scenery");
             setOpenSnackbar(true);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -183,7 +188,7 @@ export default function UpdatePage() {
     };
 
     if (!scenery) {
-        return <div>Loading...</div>
+        return <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
     }
 
     // Handle unauthorized access if user is not the uploader of the scenery
@@ -346,6 +351,12 @@ export default function UpdatePage() {
                             </Snackbar>
                         </Grid>
                     </Grid>
+                    {/* Circular Progress for loading indicator */}
+                    {isLoading && (
+                        <Grid item xs={12}>
+                            <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                        </Grid>
+                    )}
                 </Grid>
             </form>
         </Grid>

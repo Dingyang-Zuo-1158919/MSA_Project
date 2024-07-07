@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Container, Grid, Paper, Snackbar, SnackbarContent, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, CircularProgress, Container, Grid, Paper, Snackbar, SnackbarContent, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useDispatch } from 'react-redux';
 import { login } from '../Redux/Slices/authSlice';
@@ -12,6 +12,8 @@ export default function LoginPage() {
     const navigate = useNavigate();
     // Hook for dispatching actions to Redux store
     const dispatch = useDispatch();
+    // State for loading indicator
+    const [loading, setLoading] = useState(false);
     // State variables for form data
     const [formData, setFormData] = useState({
         userName: '',
@@ -30,25 +32,29 @@ export default function LoginPage() {
         // Prevent default form submission
         e.preventDefault();
 
+        // Set loading state to true to show CircularProgress
+        setLoading(true);
+
         try {
             // Send login request to the API
             const response = await axios.post(`${API_URL}/Users/Login`, formData);
+
             // Save user data in localStorage
             localStorage.setItem('userId', response.data.userId);
             localStorage.setItem('userName', response.data.userName);
             localStorage.setItem('accessToken', response.data.token.result);
-            // Dispatch login action to Redux store
             dispatch(login({
                 userId: response.data.userId,
                 userName: response.data.userName,
                 token: response.data.token.result
             }));
+
             // Show success message and navigate to homepage after a short delay
             setShowSuccessMessage(true);
             setTimeout(() => {
                 navigate('/');
             }, 1000);
-
+            
         } catch (error: any) {
             // Handle different error responses from the API
             if (error.response && error.response.status === 404) {
@@ -56,8 +62,10 @@ export default function LoginPage() {
             } else if (error.response && error.response.status === 400) {
                 setLoginError("Login failed: incorrect user information ");
             } else {
-                setLoginError(`Login failed: ${error.message}`);
+                setLoginError("Login failed: incorrect user information");
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -68,8 +76,8 @@ export default function LoginPage() {
 
         // Login form validation check
         let isValid = (
-            formData.userName.trim() !== '' && 
-            formData.password.trim() !== '' 
+            formData.userName.trim() !== '' &&
+            formData.password.trim() !== ''
         );
         setFormValid(isValid);
     };
@@ -78,6 +86,10 @@ export default function LoginPage() {
         <Container
             component={Paper} maxWidth="sm"
             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4 }}>
+
+            {/* Display CircularProgress if loading */}
+            {loading && <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />}
+
             {/* Avatar icon */}
             <Avatar sx={{ m: 5, bgcolor: 'success.main' }}></Avatar>
             {/* Login title */}

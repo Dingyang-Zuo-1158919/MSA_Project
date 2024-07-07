@@ -1,12 +1,12 @@
 import { RootState } from "../Redux/store";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Scenery } from "../models/Scenery";
 import agent from "../api/agent";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { Button, CircularProgress, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Autocomplete, Button, CircularProgress, Grid, IconButton, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import compressImage from 'browser-image-compression';
 import { ConvertByteToImageUrl } from "../tools/ConvertByteToImageUrl";
@@ -208,7 +208,7 @@ export default function UpdatePage() {
                         {image && (
                             <>
                                 <img src={image} alt="scenery image" style={{ width: '40%' }} />
-                                <IconButton onClick={handleDeleteImage} sx={{ position: 'relative', ml: '8px',  mb: '8px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                                <IconButton onClick={handleDeleteImage} sx={{ position: 'relative', ml: '8px', mb: '8px', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
                                     <DeleteIcon />
                                 </IconButton>
                             </>
@@ -244,25 +244,30 @@ export default function UpdatePage() {
                         </Grid>
                         {/* Dropdown for selecting country */}
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                variant='outlined'
-                                type='string'
-                                label='Country'
-                                select
-                                required
+                            <Autocomplete
                                 value={country}
-                                onChange={(e) => setCountry(e.target.value)}
-                                fullWidth
-                                sx={{ mb: 5 }}
-                                id="countryInput"
-                            >
-                                {/* Mapping countries to options */}
-                                {countries.map((country) => (
-                                    <MenuItem key={country} value={country}>
-                                        {country}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                                onChange={(_event: ChangeEvent<{}>, newValue: string | null) => {
+                                    if (newValue && countries.includes(newValue)) {
+                                        setCountry(newValue);
+                                    }
+                                }}
+                                inputValue={country}
+                                onInputChange={(_event, newInputValue) => {
+                                    setCountry(newInputValue); 
+                                }}
+                                options={countries}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Country"
+                                        variant="outlined"
+                                        required
+                                        fullWidth
+                                        sx={{ mb: 5 }}
+                                        error={!countries.includes(country) || country === ''}
+                                    />
+                                )}
+                            />
                             {/* Validation message if country is empty */}
                             {!country && (
                                 <p style={{ color: 'red' }}>Country can't be empty.</p>
@@ -301,7 +306,7 @@ export default function UpdatePage() {
                             {/* Save button */}
                             <Button
                                 type="button"
-                                disabled={!sceneryName || !country}
+                                disabled={!sceneryName || !country|| !countries.includes(country)}
                                 onClick={handleUpdate}
                                 sx={{
                                     color: 'white',

@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Grid, IconButton, MenuItem, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Autocomplete, Button, CircularProgress, Grid, IconButton, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { useEffect, useRef, useState } from "react";
 import Snackbar from '@mui/material/Snackbar';
@@ -246,27 +246,35 @@ export default function UploadPage() {
                         </Grid>
                         {/* Dropdown for selecting country */}
                         <Grid item xs={12} sm={6}>
-                            <TextField
-                                variant='outlined'
-                                select
-                                required
-                                label='Country'
+                            <Autocomplete
                                 value={selectedCountry}
-                                onChange={(e) => {
-                                    setSelectedCountry(e.target.value);
-                                    setCountryTouched(true);
+                                onChange={(_event, newValue) => {
+                                    if (newValue && countries.includes(newValue)) {
+                                        setSelectedCountry(newValue);
+                                        setCountryTouched(true); 
+                                    } else {
+                                        setSelectedCountry(''); 
+                                        setCountryTouched(false);
+                                    }
                                 }}
-                                fullWidth
-                                sx={{ mb: 5 }}
-                                id="countryInput"
-                            >
-                                {/* Mapping countries to options */}
-                                {countries.map((country) => (
-                                    <MenuItem key={country} value={country}>
-                                        {country}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                                inputValue={selectedCountry}
+                                onInputChange={(_event, newInputValue) => {
+                                    setSelectedCountry(newInputValue); 
+                                    setCountryTouched(true); 
+                                }}
+                                options={countries}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant='outlined'
+                                        required
+                                        label='Country'
+                                        sx={{ mb: 5 }}
+                                        id="countryInput"
+                                        error={!countries.includes(selectedCountry) && selectedCountry !== ''}
+                                    />
+                                )}
+                            />
                             {/* Validation message if country is empty after handling */}
                             {countryTouched && !selectedCountry && (
                                 <Typography variant="body2" sx={{ color: 'red' }}>Country can't be empty.</Typography>
@@ -304,7 +312,7 @@ export default function UploadPage() {
                             {/* Upload button */}
                             <Button
                                 type="submit"
-                                disabled={!sceneryName || !selectedCountry || !selectedFile}
+                                disabled={!sceneryName || !selectedCountry || !countries.includes(selectedCountry) || !selectedFile}
                                 sx={{
                                     color: 'white',
                                     fontWeight: 'bold',

@@ -48,7 +48,7 @@ export default function RegisterPage() {
       if (error.response && error.response.status === 404) {
         errors = ["Registration failed: Resource not found"];
       } else if (error.response && error.response.status === 400) {
-        errors = ["Registration failed: Password must be at least 8 characters long and include at least one non-alphanumeric character, one digit, one lowercase letter, and one uppercase letter."];
+        errors = ["Registration failed: Make your information are valid and have not been registered."];
       } else {
         errors = [`Registration failed: ${error.message}`];
       }

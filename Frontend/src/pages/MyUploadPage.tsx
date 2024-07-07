@@ -36,10 +36,12 @@ export default function MyUploadPage() {
                 };
                 setSorting(true);
                 const response = await agent.fetchUserUpload(userId, config);
-                sortUpload(response);
-                setSorting(false);
+                setUpload(response);
+                filterUpload(response, searchQuery, sortBy, sortOrder);
             } catch (error) {
                 console.error('Error fetching user collection:', error);
+            } finally {
+                setSorting(false);
             }
         };
 
@@ -52,49 +54,37 @@ export default function MyUploadPage() {
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
         setSearchQuery(query);
-        filterUpload(query);
+        filterUpload(upload, query, sortBy, sortOrder);
     };
 
-    // Filter sceneries based on search query
-    const filterUpload = (query: string) => {
+    // Sort and Filter sceneries based on search query
+    const filterUpload = (sceneries: Scenery[], query: string, sortCriteria: string, order: "asc" | "desc") => {
+        setSorting(true);
         const lowercasedQuery = query.toLowerCase();
-        const filteredData = upload.filter((item) =>
+        const filteredData = sceneries.filter((item) =>
             item.sceneryName.toLowerCase().includes(lowercasedQuery)
         );
-        setFilteredUpload(filteredData);
-    };
 
-    // Sort the uploads based on the sort criteria
-    const sortUpload = (response: Scenery[], order: "asc" | "desc" = sortOrder) => {
-        setSorting(true);
-        try {
-            const sortedUpload = [...response].sort((a, b) => {
-                if (sortBy === "sceneryName") {
-                    return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
-                } else if (sortBy === "country") {
-                    return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
-                } else if (sortBy === "city") {
-                    return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
-                }
-                return 0;
-            });
-            setUpload(sortedUpload);
-        } catch (error) {
-            console.error('Error sorting uploads:', error);
-        } finally {
-            setSorting(false);
-        }
+        const sortedData = filteredData.sort((a, b) => {
+            if (sortCriteria === "sceneryName") {
+                return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
+            } else if (sortCriteria === "country") {
+                return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
+            } else if (sortCriteria === "city") {
+                return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
+            }
+            return 0;
+        })
+        setFilteredUpload(sortedData);
+        setSorting(false);
     };
 
     // Handle sorting criteria change
     const handleSort = (criteria: string) => {
-        if (criteria === selectedSortOption) {
-            setSelectedSortOption("");
-            setSortBy("");
-        } else {
-            setSelectedSortOption(criteria);
-            setSortBy(criteria);
-        }
+        const newSortCriteria = criteria === selectedSortOption ? "" : criteria;
+        setSelectedSortOption(newSortCriteria);
+        setSortBy(newSortCriteria);
+        filterUpload(upload, searchQuery, newSortCriteria, sortOrder);
         setForceUpdate(prev => !prev);
     };
 
@@ -102,15 +92,13 @@ export default function MyUploadPage() {
     const handleSortOrder = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
-        sortUpload(upload, newSortOrder);
+        filterUpload(upload, searchQuery, sortBy, newSortOrder);
     }
 
     // Calculate the items to be displayed on the current page
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = searchQuery !== '' ?
-        filteredUpload.slice(indexOfFirstItem, indexOfLastItem) :
-        upload.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredUpload.slice(indexOfFirstItem, indexOfLastItem);
 
     // Handle page change
     const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {

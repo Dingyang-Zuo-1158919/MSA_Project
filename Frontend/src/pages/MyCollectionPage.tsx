@@ -36,10 +36,12 @@ export default function MyCollectionPage() {
                 };
                 setSorting(true);
                 const response = await agent.fetchUserCollection(userId, config);
-                sortCollection(response);
-                setSorting(false);
+                setCollection(response);
+                filterCollection(response, searchQuery, sortBy, sortOrder);
             } catch (error) {
                 console.error('Error fetching user collection:', error);
+            } finally {
+                setSorting(false);
             }
         };
 
@@ -52,49 +54,37 @@ export default function MyCollectionPage() {
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
         setSearchQuery(query);
-        filterCollection(query);
+        filterCollection(collection, query, sortBy, sortOrder);
     };
 
-    // Filter collection based on search query
-    const filterCollection = (query: string) => {
+    // Sort and Filter collection based on search query
+    const filterCollection = (sceneries: Scenery[], query: string, sortCriteria: string, order: "asc" | "desc") => {
+        setSorting(true);
         const lowercasedQuery = query.toLowerCase();
-        const filteredData = collection.filter((item) =>
+        const filteredData = sceneries.filter((item) =>
             item.sceneryName.toLowerCase().includes(lowercasedQuery)
         );
-        setFilteredCollection(filteredData);
-    };
 
-    // Sort the collection based on the sort criteria
-    const sortCollection = (response: Scenery[], order: "asc" | "desc" = sortOrder) => {
-        setSorting(true);
-        try {
-            const sortedCollection = [...response].sort((a, b) => {
-                if (sortBy === "sceneryName") {
-                    return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
-                } else if (sortBy === "country") {
-                    return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
-                } else if (sortBy === "city") {
-                    return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
-                }
-                return 0;
-            });
-            setCollection(sortedCollection);
-        } catch (error) {
-            console.error('Error sorting collections:', error);
-        } finally {
-            setSorting(false);
-        }
+        const sortedData = filteredData.sort((a, b) => {
+            if (sortCriteria === "sceneryName") {
+                return (order === "asc" ? a.sceneryName.localeCompare(b.sceneryName) : b.sceneryName.localeCompare(a.sceneryName));
+            } else if (sortCriteria === "country") {
+                return (order === "asc" ? a.country.localeCompare(b.country) : b.country.localeCompare(a.country));
+            } else if (sortCriteria === "city") {
+                return (order === "asc" ? a.city.localeCompare(b.city) : b.city.localeCompare(a.city));
+            }
+            return 0;
+        })
+        setFilteredCollection(sortedData);
+        setSorting(false);
     };
 
     // Handle sorting criteria change
     const handleSort = (criteria: string) => {
-        if (criteria === selectedSortOption) {
-            setSelectedSortOption("");
-            setSortBy("");
-        } else {
-            setSelectedSortOption(criteria);
-            setSortBy(criteria);
-        }
+        const newSortCriteria = criteria === selectedSortOption ? "" : criteria;
+        setSelectedSortOption(newSortCriteria);
+        setSortBy(newSortCriteria);
+        filterCollection(collection, searchQuery, newSortCriteria, sortOrder);
         setForceUpdate(prev => !prev);
     };
 
@@ -102,15 +92,13 @@ export default function MyCollectionPage() {
     const handleSortOrder = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
-        sortCollection(collection, newSortOrder);
+        filterCollection(collection, searchQuery, sortBy, newSortOrder);
     }
 
     // Calculate the items to be displayed on the current page
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = searchQuery !== '' ?
-        filteredCollection.slice(indexOfFirstItem, indexOfLastItem) :
-        collection.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredCollection.slice(indexOfFirstItem, indexOfLastItem);
 
     // Handle page change
     const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {

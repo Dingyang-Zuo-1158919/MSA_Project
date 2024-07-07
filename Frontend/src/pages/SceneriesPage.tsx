@@ -24,17 +24,21 @@ export default function SceneriesPage() {
     // Fetch sceneries when component mounts or sort order changes
     useEffect(() => {
         fetchSceneries();
-    }, [sortBy, sortOrder]);
+    }, [sortBy, sortOrder, searchQuery]);
 
     // Fetch sceneries from API
     const fetchSceneries = async () => {
         try {
             setSorting(true);
             const sceneriesData = await agent.getAllSceneries();
-            sortSceneries(sceneriesData);
+            const sortedSceneries = sortSceneries(sceneriesData);
+            setSceneries(sortedSceneries);
+            setFilteredSceneries(filterSceneries(sortedSceneries, searchQuery));
             setSorting(false);
         } catch (error) {
             console.error('Error fetching sceneries:', error);
+        } finally {
+            setSorting(false);
         }
     };
 
@@ -42,16 +46,18 @@ export default function SceneriesPage() {
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value;
         setSearchQuery(query);
-        filterSceneries(query);
+        const filtered = filterSceneries(sceneries, query);
+        setFilteredSceneries(filtered);
     };
 
     // Filter sceneries based on search query
-    const filterSceneries = (query: string) => {
+    const filterSceneries = (sceneriesData: Scenery[], query: string) => {
         const lowercasedQuery = query.toLowerCase();
-        const filteredData = sceneries.filter((item) =>
-            item.sceneryName.toLowerCase().includes(lowercasedQuery)
-        );
-        setFilteredSceneries(filteredData);
+        const filtered = sceneriesData.filter((item) => {
+            const sceneryName = item.sceneryName.toLowerCase();
+            return sceneryName.includes(lowercasedQuery);
+        });
+        return filtered;
     };
 
     // Sort sceneries based on selected criteria
@@ -68,9 +74,10 @@ export default function SceneriesPage() {
                 }
                 return 0;
             });
-            setSceneries(sortedSceneries);
+            return sortedSceneries;
         } catch (error) {
             console.error('Error sorting sceneries:', error);
+            return sceneriesData;
         } finally {
             setSorting(false);
         }
@@ -85,13 +92,19 @@ export default function SceneriesPage() {
             setSelectedSortOption(criteria);
             setSortBy(criteria);
         }
+
+        const sortedSceneries = sortSceneries(searchQuery !== "" ? filteredSceneries : sceneries);
+        setSceneries(sortedSceneries);
+        setFilteredSceneries(filterSceneries(sortedSceneries, searchQuery));
     };
 
     // Handle sorting order change
     const handleSortOrder = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
-        sortSceneries(sceneries, newSortOrder);
+        const sortedSceneries = sortSceneries(searchQuery !== "" ? filteredSceneries : sceneries, newSortOrder);
+        setSceneries(sortedSceneries);
+        setFilteredSceneries(filterSceneries(sortedSceneries, searchQuery));
     }
 
     // Calculate the items to be displayed on the current page
@@ -119,7 +132,7 @@ export default function SceneriesPage() {
                     flexDirection: 'column',
                     alignItems: 'left',
                     justifyContent: 'flex-start',
-                    flexShrink:0,
+                    flexShrink: 0,
                 }}
             >
                 {/* Search functionality */}

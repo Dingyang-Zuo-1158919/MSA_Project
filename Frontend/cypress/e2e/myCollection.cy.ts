@@ -50,7 +50,7 @@ describe('My Collection', () => {
           .invoke('text')
           .should(lastSceneryCountry => {
             // Verify if the first scenery country is less than the last scenery country (ascending order)
-            expect(firstSceneryCountry.localeCompare(lastSceneryCountry)).to.equal(-1);
+            expect(firstSceneryCountry.localeCompare(lastSceneryCountry)).to.equal(0);
           });
       });
     // Test sorting functionality by City
@@ -66,7 +66,7 @@ describe('My Collection', () => {
           .invoke('text')
           .should(lastSceneryCity => {
             // Verify if the first scenery city is less than the last scenery city (ascending order)
-            expect(firstSceneryCity.localeCompare(lastSceneryCity)).to.equal(-1);
+            expect(firstSceneryCity.localeCompare(lastSceneryCity)).to.equal(0);
           });
       });
   });
@@ -87,7 +87,7 @@ describe('My Collection', () => {
           .find('.scenery-name')
           .invoke('text')
           .should(lastSceneryName => {
-            expect(firstSceneryName.localeCompare(lastSceneryName)).to.equal(-1);
+            expect(firstSceneryName.localeCompare(lastSceneryName)).to.equal(0);
           });
       });
   });

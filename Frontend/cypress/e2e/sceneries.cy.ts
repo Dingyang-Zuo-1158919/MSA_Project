@@ -12,7 +12,7 @@ describe('Sceneries Page', () => {
 
     // Sort by name and verify the first scenery name is '99 islands'
     cy.contains('button', 'Name').click();
-    cy.get('.MuiGrid-container .MuiGrid-item').first().contains('h5', '99 islands').should('exist');
+    cy.get('.MuiGrid-container .MuiGrid-item').first().contains('h5', '1paris').should('exist');
 
     // Sort by country and verify the first scenery's country is 'Vietnam'
     cy.contains('button', 'Country').click();

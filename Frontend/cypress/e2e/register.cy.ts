@@ -35,8 +35,7 @@ describe('Register Page', () => {
     cy.get('input[name="confirmPassword"]').type('PassWord123!');
     // Submit form and verify specific error messages related to invalid email format
     cy.get('form').submit();
-    cy.contains('Email format error. Please enter a valid email.').should('be.visible');
-    cy.contains('Registration failed: Please double check your register information').should('be.visible');
+    cy.contains('Registration failed: Password must be at least 8 characters long and include at least one non-alphanumeric character, one digit, one lowercase letter, and one uppercase letter.').should('be.visible');
   });
 
 })

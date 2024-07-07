@@ -8,8 +8,8 @@ describe('AboutPage', () => {
   it('Display scenery details correctly', () => {
     // Check if the image, title, location, and uploader comment are displayed correctly
     cy.get('img').should('be.visible');
-    cy.get('h3').should('contain.text', '99 island');
-    cy.get('h4').should('contain.text', 'Japan - Sasebo');
+    cy.get('h3').should('contain.text', '1paris');
+    cy.get('h4').should('contain.text', 'France - Paris');
     cy.contains('Uploader Comment:').should('be.visible');
   });
 

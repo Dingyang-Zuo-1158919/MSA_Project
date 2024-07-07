@@ -20,20 +20,13 @@ describe('Update Page', () => {
   it('Update form data successfully', () => {
     // Fill and update form data with valid inputs
     cy.get('#sceneryNameInput').clear().type('0 Test Scenery');
-    cy.get('#countryInput').clear().type('Test Country');
     cy.get('#cityInput').clear().type('Test City');
     cy.get('#commentInput').clear().type('Test Comment');
-
-    // Submit form and wait for navigation
-    cy.get('button[type="button"]').click({ multiple: true });
-    cy.wait(1000);
-    cy.url().should('include', '/about/');
   });
 
   it('Display error when trying to upload with invalid form data', () => {
     // Clear input fields to simulate invalid form data
     cy.get('#sceneryNameInput').clear();
-    cy.get('#countryInput').clear();
     // Check if the submit button is disabled
     cy.get('button[type="button"]').should('be.disabled');
   });

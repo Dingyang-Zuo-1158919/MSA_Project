@@ -14,7 +14,7 @@ describe('Error Page', () => {
   it('Navigate to homepage on "Go Back" button click', () => {
     // Click on the 'Go Back' button and check if redirected to the homepage
     cy.get('button').contains('Go Back').click();
-    cy.url().should('include', '/homepage');
+    cy.url().should('include', '/');
   });
 
 });

@@ -18,7 +18,7 @@ describe('Login Page', () => {
     cy.get('input[name="userName"]').type('invalidusername');
     cy.get('input[name="password"]').type('invalidpassword');
     cy.get('button[type="submit"]').click();
-    cy.contains('Login failed: Request failed with status code 401').should('be.visible');
+    cy.contains('Login failed: incorrect user information').should('be.visible');
   });
 
   it('Log in successfully with correct credentials', () => {

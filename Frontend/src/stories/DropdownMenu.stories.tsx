@@ -29,16 +29,23 @@ const mockStore = {
 };
 
 // Template component for Storybook
-const Template: StoryFn = () => (
-  <BrowserRouter>
-    {/* Provide the mock Redux store */}
-    <Provider store={mockStore as any}>
-      <ThemeProvider theme={theme}>
-        <DropdownMenu />
-      </ThemeProvider>
-    </Provider>
-  </BrowserRouter>
-);
+const Template: StoryFn = () => {
+  const onItemClick = (label: string) => {
+    // Mock implementation or logging for onItemClick action
+    action('onItemClick')(label);
+  };
+
+  return (
+    <BrowserRouter>
+      {/* Provide the mock Redux store */}
+      <Provider store={mockStore as any}>
+        <ThemeProvider theme={theme}>
+          <DropdownMenu onItemClick={onItemClick} />
+        </ThemeProvider>
+      </Provider>
+    </BrowserRouter>
+  );
+};
 
 // Story for the default state of the DropdownMenu
 export const Default = Template.bind({});

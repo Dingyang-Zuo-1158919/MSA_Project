@@ -1,4 +1,5 @@
-import { Button, CircularProgress, Divider, Grid, Link, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, Divider, Grid, Link, Typography, useMediaQuery, useTheme } from "@mui/material";
+import StarIcon from '@mui/icons-material/Star';
 import agent from "../api/agent";
 import { useEffect, useState } from "react";
 import { Scenery } from "../models/Scenery";
@@ -238,8 +239,8 @@ export default function AboutPage() {
                     <Grid item xs={12} sm={6}>
                         {/* Collect/Collected button */}
                         <Button component={Link} disabled={!isLoggedIn} data-testid="collect-button"
-                            onClick={handleCollect} sx={{
-                                color: 'white', backgroundColor: '#a2cf6e', fontWeight: 'bold', fontSize: '15px',
+                            onClick={handleCollect} variant="outlined" sx={{
+                                color: '#a2cf6e', backgroundColor: 'transparent', fontWeight: 'bold', fontSize: '15px',
                                 border: "2px solid #a2cf6e",
                                 '&:hover': {
                                     backgroundColor: "#4caf50",
@@ -247,14 +248,20 @@ export default function AboutPage() {
                                     border: "2px solid #4caf50",
                                 },
                                 width: isMobile ? '100%' : 'auto',
-                            }}>{isCollected ? 'Collected' : 'Collect'}</Button>
+                            }}>{isCollected ? (
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                  <StarIcon />
+                                  Collected
+                                </Box>
+                              ) : 'Collect'}</Button>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
                         {/* Update button */}
                         <Button component={Link} disabled={!isLoggedIn || userId !== scenery.userId}
-                            data-testid="update-button" onClick={() => navigate(`/update/${Id}`)} sx={{
-                                color: "white", backgroundColor: "#ffc107", fontWeight: 'bold', fontSize: '15px',
+                            data-testid="update-button" onClick={() => navigate(`/update/${Id}`)} 
+                            variant="outlined" sx={{
+                                color: "#ffc107", backgroundColor: "transparent", fontWeight: 'bold', fontSize: '15px',
                                 border: "2px solid #ffc107",
                                 '&:hover': {
                                     backgroundColor: "#ff9800",
@@ -267,8 +274,9 @@ export default function AboutPage() {
 
                     <Grid item xs={12} sm={6}>
                         {/* Delete button */}
-                        <Button onClick={handleOpenModal} disabled={!isLoggedIn || userId !== scenery.userId} sx={{
-                            color: theme.palette.error.contrastText, backgroundColor: "#f6685e", fontWeight: 'bold', fontSize: '15px',
+                        <Button onClick={handleOpenModal} disabled={!isLoggedIn || userId !== scenery.userId} 
+                            variant="outlined" sx={{
+                            color:'#f6685e', backgroundColor: "transparent", fontWeight: 'bold', fontSize: '15px',
                             border: "2px solid #f6685e",
                             '&:hover': {
                                 backgroundColor: theme.palette.error.main,
@@ -289,9 +297,10 @@ export default function AboutPage() {
                         {/* Return button */}
                         <Button
                             onClick={() => navigate("/sceneries")}
+                            variant="outlined"
                             sx={{
-                                color: 'white',
-                                backgroundColor: '#33ab9f',
+                                color: '#33ab9f',
+                                backgroundColor: 'transparent',
                                 fontWeight: 'bold',
                                 fontSize: '15px',
                                 border: "2px solid #33ab9f",

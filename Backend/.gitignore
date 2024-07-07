@@ -6,3 +6,4 @@ appsettings.json
 
 #user certificate
 Certificates.p12
+.fake

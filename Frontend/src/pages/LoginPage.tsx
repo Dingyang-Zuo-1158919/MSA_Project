@@ -22,6 +22,8 @@ export default function LoginPage() {
     const [loginError, setLoginError] = useState('');
     // State to control success Snackbar visibility
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    // State to check if account name and password are not empty
+    const [formValid, setFormValid] = useState(false);
 
     // Handler for form submission
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,6 +65,13 @@ export default function LoginPage() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name!]: value });
+
+        // Login form validation check
+        let isValid = (
+            formData.userName.trim() !== '' && 
+            formData.password.trim() !== '' 
+        );
+        setFormValid(isValid);
     };
 
     return (
@@ -72,20 +81,20 @@ export default function LoginPage() {
             {/* Avatar icon */}
             <Avatar sx={{ m: 5, bgcolor: 'success.main' }}></Avatar>
             {/* Login title */}
-            <Typography component="h1" variant="h4" >
+            <Typography component="h1" variant="h4">
                 Log in
             </Typography>
             {/* Login form */}
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                <TextField margin="normal" fullWidth label="Username" autoFocus name="userName" onChange={handleChange} autoComplete="current-username" />
-                <TextField margin="normal" fullWidth label="Password" type="password" name="password" onChange={handleChange} autoComplete="current-password" />
+                <TextField required margin="normal" fullWidth label="Username" autoFocus name="userName" onChange={handleChange} autoComplete="current-username" />
+                <TextField required margin="normal" fullWidth label="Password" type="password" name="password" onChange={handleChange} autoComplete="current-password" />
                 {/* Display login error message if any */}
                 {loginError && (
                     <Typography variant="body2" color="error" paragraph>
                         {loginError}
                     </Typography>
                 )}
-                <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                <Button type="submit" fullWidth disabled={!formValid} variant="contained" sx={{ mt: 3, mb: 2 }}>
                     Sign In
                 </Button>
                 {/* Link to the registration page */}

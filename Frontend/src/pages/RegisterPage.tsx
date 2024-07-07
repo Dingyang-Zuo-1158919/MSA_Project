@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [isUsernameTouched, setIsUsernameTouched] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,7 +44,7 @@ export default function RegisterPage() {
       if (error.response && error.response.status === 404) {
         errors = ["Registration failed: Resource not found"];
       } else if (error.response && error.response.status === 400) {
-        errors = ["Registration failed: Please double check your register information"];
+        errors = ["Registration failed: Password must be at least 8 characters long and include at least one non-alphanumeric character, one digit, one lowercase letter, and one uppercase letter."];
       } else {
         errors = [`Registration failed: ${error.message}`];
       }
@@ -64,10 +65,15 @@ export default function RegisterPage() {
 
     // Registration form inputs validation check
     let currentPasswordsMatch = passwordsMatch;
+    let currentPasswordValid = isPasswordValid;
 
     if (name === 'password') {
       currentPasswordsMatch = value === formData.confirmPassword;
       setPasswordsMatch(currentPasswordsMatch);
+      // Password validation regex
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/u;
+      currentPasswordValid = passwordRegex.test(value);
+      setIsPasswordValid(currentPasswordValid);
     } else if (name === 'confirmPassword') {
       currentPasswordsMatch = value === formData.password;
       setPasswordsMatch(currentPasswordsMatch);
@@ -84,7 +90,8 @@ export default function RegisterPage() {
       isEmailValid &&
       formData.password.trim() !== '' &&
       formData.confirmPassword.trim() !== '' &&
-      currentPasswordsMatch
+      currentPasswordsMatch &&
+      currentPasswordValid
     );
 
     if (name === 'userName') {
@@ -95,7 +102,8 @@ export default function RegisterPage() {
         isEmailValid &&
         formData.password.trim() !== '' &&
         formData.confirmPassword.trim() !== '' &&
-        currentPasswordsMatch
+        currentPasswordsMatch &&
+        currentPasswordValid
       );
     }
     setFormValid(isValid);
@@ -121,15 +129,19 @@ export default function RegisterPage() {
           <TextField margin="normal" fullWidth label="Email" name="email" onChange={handleChange} required autoComplete="current-email" />
           {/* Display email validation error message if any */}
           {!isEmailValid && (
-            <p style={{ color: 'red' }}>Email format error. Please enter a valid email.</p>
+            <p style={{ color: 'blue' }}>Please enter a valid email.</p>
           )}
         </div>
         <TextField margin="normal" fullWidth label="Password" type="password" name="password" onChange={handleChange} required autoComplete="current-password" />
+        {/* Display password validation error message if any */}
+        {!isPasswordValid && (
+          <p style={{ color: 'blue' }}>Password must be at least 8 characters long and include at least one non-alphanumeric character, one digit, one lowercase letter, and one uppercase letter.</p>
+        )}
         <div>
           <TextField margin="normal" fullWidth label="Confirm Password" type="password" placeholder="Confirm Password" name="confirmPassword" onChange={handleChange} required autoComplete="current-confirmpassword" />
           {/* Display password validation error message if any */}
           {!passwordsMatch && (
-            <p style={{ color: 'red' }}>Passwords do not match. Please enter matching passwords.</p>
+            <p style={{ color: 'red' }}>Passwords do not match. Please enter matching password.</p>
           )}
         </div>
         {/* Display registration error message if any */}

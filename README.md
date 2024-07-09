@@ -1,7 +1,13 @@
 # MSA_Project by Dingyang Zuo
 
+## Web App Link
+https://scenerysharingfrontend.azurewebsites.net
+
+## Presentation Video Link
+https://drive.google.com/file/d/1hLOksxqfhOQy-6hrJcyvnH3CMdkZQqom/view?usp=drive_link
+
 ## Brief Introduction
-The project is a web application built on ASP.NET Core as backend and React(TypeScript) as frontend that allows users to upload, share, and manage scenic  photographs. It includes functionalities for user authentication, scenery management, and collection tracking.
+The project is a web application built on .NET8 as backend and React(TypeScript) as frontend that allows users to upload, share, and manage scenic  photographs. It includes functionalities for user authentication, scenery management, and collection tracking.
 
 ## One Thing I am Very Proud Of
 One of the things that I feel proud of is the strategy for image data storage and transfer I developed.

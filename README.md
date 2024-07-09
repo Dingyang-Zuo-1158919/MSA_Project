@@ -6,6 +6,9 @@ https://scenerysharingfrontend.azurewebsites.net
 ## Presentation Video Link
 https://drive.google.com/file/d/1hLOksxqfhOQy-6hrJcyvnH3CMdkZQqom/view?usp=drive_link
 
+## Full-page screenshos of the two Azure SQL modules
+https://drive.google.com/drive/folders/1sasfMupfEFyswoiJ8CruDty3fRGs9PqK?usp=drive_link
+
 ## Brief Introduction
 The project is a web application built on .NET8 as backend and React(TypeScript) as frontend that allows users to upload, share, and manage scenic  photographs. It includes functionalities for user authentication, scenery management, and collection tracking.
 

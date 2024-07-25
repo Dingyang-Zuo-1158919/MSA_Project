@@ -13,9 +13,10 @@ https://drive.google.com/drive/folders/1sasfMupfEFyswoiJ8CruDty3fRGs9PqK?usp=dri
 The project is a web application built on .NET8 as backend and React(TypeScript) as frontend that allows users to upload, share, and manage scenic  photographs. It includes functionalities for user authentication, scenery management, and collection tracking.
 
 ## One Thing I am Very Proud Of
-One of the things that I feel proud of is the strategy for image data storage and transfer I developed.
-
-After encountering several challenges, I successfully implemented a method to store image data as byte[] in the database. I adapted DTOs to receive image data as files from the frontend and converted them into byte[] on the backend. Additionally, I ensured smooth transfer of image data as byte[] from the backend to the frontend, where it is converted into URLs for display.
+One of the things that I feel very proud of is the strategy for manipulating image data I developed.
+Initially I set image data as byte[] in backend, set image data as Blob in frontend and transfer image data to byte[] via controller in backend. But it never works.
+After encountering 8 hours' attempts, trying to transfer the image data into different format and trying to use azure blob to store image file but all with fail results, 
+I successfully implemented a method. I adapted DTOs to receive image data as files from the frontend and converted them into byte[] on the backend. I made smooth transfer of image data as byte[] from the backend to the frontend, where it is converted into URLs for displaying.
 
 ## Implemented Features
 
@@ -23,6 +24,7 @@ After encountering several challenges, I successfully implemented a method to st
 - **Homepage:** Displays a slideshow of scenic images using React Slick for a visually appealing presentation.
 - **Sceneries Page:** Lists various scenic images with pagination, searching, and sorting functionalities.
 - **About Page:** Provides detailed information about a specific scenery, including operations for Update, Delete, and Collect.
+- **Upload Page:** Provides detailed information about a specific scenery, including operations for Update, Delete, and Collect.
 - **User Authentication:** Includes login and registration functionalities with authentication tokens stored securely. Implemented user authentication and authorization using ASP.NET Identity and JWT tokens.
 - **API Endpoints**: Created CRUD operations for managing sceneries and collections.
 - **Database Integration**: Utilized Entity Framework Core with SQL Server for database operations.
